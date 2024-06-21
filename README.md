@@ -53,7 +53,7 @@ As a returning user, I want to see a visually appealing and intuitive login page
 - **Acceptance Criteria:**
   - Approval from the Product Owner
   - Feedback from team members
-- **Estimated in Story Points:** 3
+- **Estimated in Story Points:** 5
 
 #### Develop Backend for Login
 **User Story:**
@@ -71,7 +71,7 @@ As a user, I want a secure and reliable backend for login so that my personal in
   - Successful login with valid user login information
   - Error message for failed login with invalid user login information
   - Secure user information handling
-- **Estimated in Story Points:** 5
+- **Estimated in Story Points:** 21
 
 #### Implement Single Sign-On
 **User Story:**
@@ -88,7 +88,7 @@ As a user, I want to log in using my social media accounts so that I can access 
 - **Acceptance Criteria:**
   - Successful login with the user's existing account
   - Error handling for failed SSO
-- **Estimated in Story Points:** 8
+- **Estimated in Story Points:** 21
 
 ### Profile Creation
 
@@ -107,7 +107,7 @@ As a new user, I want a simple, straightforward and user-friendly profile creati
 - **Acceptance Criteria:**
   - Approval of the Product Owner
   - Feedback from team members
-- **Estimated in Story Points:** 3
+- **Estimated in Story Points:** 5
 
 #### Develop Backend for Profile Creation
 **User Story:**
@@ -127,7 +127,7 @@ As a user, I want the backend to be able to handle my profile data securely so t
 - **Acceptance Criteria:**
   - Successful creation of user profile with valid data
   - Error handling for invalid data
-- **Estimated in Story Points:** 5
+- **Estimated in Story Points:** 21
 
 #### Implement Profile Photo Upload
 **User Story:**
@@ -143,7 +143,7 @@ As a user, I want to be able to upload a profile photo so that my account feels 
 - **Acceptance Criteria:**
   - Successful upload and display of profile photo
   - Error handling for unsupported file formats and sizes
-- **Estimated in Story Points:** 5
+- **Estimated in Story Points:** 21
 
 ### Messaging
 
@@ -161,7 +161,7 @@ As a user, I want an feasible messaging interface so that I can communicate effe
 - **Acceptance Criteria:**
   - Approval from the Product Owner
   - Feedback from team members
-- **Estimated in Story Points:** 8
+- **Estimated in Story Points:** 5
 
 #### Design Messaging Backend
 **User Story:**
@@ -178,7 +178,7 @@ As a user, I need the backend to securely and efficiently manage my messages, gu
 - **Acceptance Criteria:**
   - Successful sending and receiving of messages
   - Secure message handling
-- **Estimated in Story Points:** 8
+- **Estimated in Story Points:** 21
 
 ### Matching
 
@@ -196,7 +196,7 @@ As a user, I want an engaging and intuitive matching interface so that I can fin
 - **Acceptance Criteria:**
   - Approval from the Product Owner
   - Feedback from team members
-- **Estimated in Story Points:** 8
+- **Estimated in Story Points:** 5
 
 #### Creating Matching Algorithm
 **User Story:**
@@ -212,7 +212,7 @@ As a user, I want a matching algorithm that considers my preferences so that I c
 - **Acceptance Criteria:**
   - Algorithm returns accurate matches
   - Successfully displays match feedback when the users match each other
-- **Estimated in Story Points:** 13
+- **Estimated in Story Points:** 8
 
 ### Social Media
 
@@ -245,7 +245,7 @@ As a system user, I want my personal information to be stored securely so that m
 - **Acceptance Criteria:**
   - Approval from team members
   - Data is secured and organized successfully
-- **Estimated in Story Points:** 3
+- **Estimated in Story Points:** 8
 
 #### Design DB Table for Preferences
 **User Story:**
@@ -259,7 +259,7 @@ As a user, I want my preferences to be stored efficiently so that the app can pr
 - **Acceptance Criteria:**
   - Approval from team members
   - Data is organized successfully
-- **Estimated in Story Points:** 3
+- **Estimated in Story Points:** 8
 
 #### Design DB Table for Profile
 **User Story:**
@@ -273,7 +273,7 @@ As a system user, I want my profile information to be stored efficiently so that
 - **Acceptance Criteria:**
   - Approval from team members
   - Data is secured and organized successfully
-- **Estimated in Story Points:** 3
+- **Estimated in Story Points:** 8
 
 ### Preferences
 
@@ -291,4 +291,4 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
 - **Acceptance Criteria:**
   - Approval from the Product Owner
   - Feedback from team members
-- **Estimated in Story Points:** 3
+- **Estimated in Story Points:** 8
