@@ -41,7 +41,7 @@ DB: Firebase
 
 #### Design Login Page UI
 **User Story:**
-As a user, I want a visually appealing and user-friendly login page so that I can easily access my account.
+As a returning user, I want to see a visually appealing and intuitive login page so that I can easily log into my account.
 
 **Details:**
 - **Requirements:**
@@ -57,7 +57,7 @@ As a user, I want a visually appealing and user-friendly login page so that I ca
 
 #### Develop Backend for Login
 **User Story:**
-As a developer, I want to create the backend functionality for user login so that users can securely access their accounts.
+As a user, I want a secure and reliable backend for login so that my personal information stays protected during the authentication process.
 
 **Details:**
 - **Requirements:**
@@ -75,7 +75,7 @@ As a developer, I want to create the backend functionality for user login so tha
 
 #### Implement Single Sign-On
 **User Story:**
-As a user, I want to log in using my existing accounts so that I can access the app without creating a new account.
+As a user, I want to log in using my social media accounts so that I can access the application without having to create a new account.
 
 **Details:**
 - **Requirements:**
@@ -94,7 +94,7 @@ As a user, I want to log in using my existing accounts so that I can access the 
 
 #### Design Profile Creation UI
 **User Story:**
-As a user, I want an intuitive and user-friendly profile creation interface so that I can easily set up my account and preferences.
+As a new user, I want a simple, straightforward and user-friendly profile creation interface so that I can set up my profile quickly and efficiently.
 
 **Details:**
 - **Requirements:**
@@ -111,7 +111,7 @@ As a user, I want an intuitive and user-friendly profile creation interface so t
 
 #### Develop Backend for Profile Creation
 **User Story:**
-As a developer, I want to create the backend functionality for profile creation so that users can store their personal information and preferences.
+As a user, I want the backend to be able to handle my profile data securely so that my personal information is stored safely and can be updated when needed.
 
 **Details:**
 - **Requirements:**
@@ -131,7 +131,7 @@ As a developer, I want to create the backend functionality for profile creation 
 
 #### Implement Profile Photo Upload
 **User Story:**
-As a user, I want to upload my profile photo so that my profile is complete and personalized.
+As a user, I want to be able to upload a profile photo so that my account feels more personalized and identifiable.
 
 **Details:**
 - **Requirements:**
@@ -149,7 +149,7 @@ As a user, I want to upload my profile photo so that my profile is complete and 
 
 #### Design Messaging UI
 **User Story:**
-As a user, I want an intuitive and easy-to-use messaging interface so that I can easily communicate with other users.
+As a user, I want an feasible messaging interface so that I can communicate effectively with other users.
 
 **Details:**
 - **Requirements:**
@@ -165,7 +165,7 @@ As a user, I want an intuitive and easy-to-use messaging interface so that I can
 
 #### Design Messaging Backend
 **User Story:**
-As a developer, I want to design the backend for messaging so that users can communicate with each other within the app.
+As a user, I need the backend to securely and efficiently manage my messages, guaranteeing the privacy and reliability of my conversations. 
 
 **Details:**
 - **Requirements:**
@@ -184,7 +184,7 @@ As a developer, I want to design the backend for messaging so that users can com
 
 #### Design Matching UI
 **User Story:**
-As a user, I want an engaging matching interface so that I can find adventure partners easily.
+As a user, I want an engaging and intuitive matching interface so that I can find and connect with other users who share my interests.
 
 **Details:**
 - **Requirements:**
@@ -200,7 +200,7 @@ As a user, I want an engaging matching interface so that I can find adventure pa
 
 #### Creating Matching Algorithm
 **User Story:**
-As a developer, I want to develop an algorithm to match users based on their adventure, skills, and behaviors within their selected mile range so that they can find compatible adventure partners.
+As a user, I want a matching algorithm that considers my preferences so that I can receive relevant and compatible match suggestions.
 
 **Details:**
 - **Requirements:**
@@ -218,7 +218,7 @@ As a developer, I want to develop an algorithm to match users based on their adv
 
 #### Design Social Media UI
 **User Story:**
-As a user, I want to connect my profile to my social media accounts so that I can share my adventures.
+As a user, I want an engaging and interactive social media interface so that I can share my thoughts, updates and interact with other users. 
 
 **Details:**
 - **Requirements:**
@@ -235,7 +235,7 @@ As a user, I want to connect my profile to my social media accounts so that I ca
 
 #### Design DB Table for Users
 **User Story:**
-As a developer, I want to design a database table for storing user information so that user data is stored efficiently and securely.
+As a system user, I want my personal information to be stored securely so that my data is protected and easily retrievable.
 
 **Details:**
 - **Requirements:**
@@ -249,7 +249,7 @@ As a developer, I want to design a database table for storing user information s
 
 #### Design DB Table for Preferences
 **User Story:**
-As a developer, I want to design a database table for storing user preferences so that user preferences are stored efficiently and can be used for matching.
+As a user, I want my preferences to be stored efficiently so that the app can provide personalized recommendations based on my settings.
 
 **Details:**
 - **Requirements:**
@@ -263,7 +263,7 @@ As a developer, I want to design a database table for storing user preferences s
 
 #### Design DB Table for Profile
 **User Story:**
-As a developer, I want to design a database table for storing user profiles so that profile data is stored efficiently and securely.
+As a system user, I want my profile information to be stored efficiently so that my data is secure and accessible when needed.
 
 **Details:**
 - **Requirements:**
@@ -279,7 +279,7 @@ As a developer, I want to design a database table for storing user profiles so t
 
 #### Design UI Submit Form for Preferences
 **User Story:**
-As a user, I want a simple and intuitive form to submit my preferences so that the app can match me with suitable adventure partners.
+As a user, I want a simple and intuitive form to submit my preferences so that I can customize my experience on the platform.
 
 **Details:**
 - **Requirements:**
