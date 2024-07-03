@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { auth } from './firebaseConfig';
 
+
 export default function HomeScreen({ navigation }) {
   const handleLogout = () => {
     auth.signOut().then(() => {
@@ -16,6 +17,9 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.title}>Home Screen</Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')}>
         <Text style={styles.buttonText}>Update Profile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Preferences')}>
+        <Text style={styles.buttonText}>Change Preferences</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
