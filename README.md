@@ -349,6 +349,6 @@ Parker: In collaboration with Alaina Magee, we worked on implementing the initia
 Since we are using expo go and it is a local instance of the app that is not currently available publicly, we aren't able to provide a direct link to the app. However, there is a file in the repo called "App Demo Outdora" that displays our progress so far.
 
 ### Sprint Review and Retrospective Link
-
+https://kennesawedu-my.sharepoint.com/:v:/r/personal/agouch_students_kennesaw_edu/Documents/Recordings/SWE%20Sprint%20Review-20240706_150333-Meeting%20Recording.mp4?csf=1&web=1&e=6S1MAB
   
   
