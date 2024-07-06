@@ -314,7 +314,7 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
 - **Estimated in Story Points:** 8
 - **Rationale**: This task encompasses designing responsive layouts, ensuring clear instructions, implementing validation messages, and obtaining necessary approvals. This effort is crucial as it complements foundational tasks like login functionalities, contributing to a seamless user experience and customization capability within the platform.
 
-- #### Sprint 1
+- # Sprint 1
 - ### Story Point Rationale
 - 
 - ### Sprint 1 Burndown Chart:
