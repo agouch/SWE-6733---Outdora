@@ -292,6 +292,5 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 8
-
 - **Sprint 1 Burndown Chart:**
 <img width="357" alt="Screenshot 2024-07-06 at 1 13 46 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/50bc24b2-5eb8-4440-ab36-4a3f6cff9ab0">
