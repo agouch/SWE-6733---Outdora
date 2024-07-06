@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { auth, firestore } from './firebaseConfig';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-import { TouchableOpacity } from 'react-native';
 
 
-const PreferencesScreen = () => {
+const PreferencesScreen = ({ navigation }) => {
 
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedAge, setSelectedAge] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
+  const [loading, setLoading] = useState(true);
   const handleSelectGender = (gender) => {
     setSelectedGender(gender);
   };
@@ -22,9 +24,59 @@ const PreferencesScreen = () => {
   const handleSelectRegion = (region) => {
     setSelectedRegion(region);
   };
+
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchUserPreferences = async () => {
+      try {
+        const userRef = doc(firestore, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setSelectedGender(userData.selectedGender || '');
+          setSelectedActivity(userData.selectedActivity || '');
+          setSelectedAge(userData.selectedAge || '');
+          setSelectedRegion(userData.selectedRegion || '');
+        }
+      } catch (error) {
+        console.error('Error fetching user preferences:', error);
+        setLoading(false);
+      }
+      finally {
+      setLoading(false);
+    }
+    };
+
+    fetchUserPreferences();
+  }, []);
   const handleSave = async () => {
-    
+    if (user){
+      try {
+        const userRef = doc(firestore, 'users', user.uid);
+        await setDoc(userRef, {
+          selectedGender,
+          selectedActivity,
+          selectedAge,
+          selectedRegion
+        }, { merge: true });
+
+        Alert.alert('Preferences Updated', 'Your preferences have been updated successfully.');
+        navigation.navigate('Home');
+      } catch (error) {
+        console.error('Error updating preferences:', error);
+        Alert.alert('Error', 'There was an error updating your preferences. Please try again.');
+      }
+    }
   };
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
    <Text style={styles.title}>Update Preferences</Text>
