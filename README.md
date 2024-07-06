@@ -54,9 +54,10 @@ As a returning user, I want to see a visually appealing and intuitive login page
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
-- **Rationale:** 
-
+- **Rationale:** The task involves designing a login page that is both functional and aesthetically pleasing, incorporating essential features such as email/password fields, SSO options, and error messages. Given the moderate complexity of ensuring the page is user-friendly and responsive across different devices, this task is estimated at 5 story points in Jira.
+  
 #### Develop Backend for Login
+
 **User Story:**
 As a user, I want a secure and reliable backend for login so that my personal information stays protected during the authentication process.
 
@@ -73,8 +74,10 @@ As a user, I want a secure and reliable backend for login so that my personal in
   - Error message for failed login with invalid user login information
   - Secure user information handling
 - **Estimated in Story Points:** 21
+- **Rationale:** The implementation of a secure backend for user login is critical to ensuring the protection of user data and maintaining a seamless user experience. This task involves integrating robust validation mechanisms, establishing secure database interactions, and implementing error handling to enhance security and usability. The complexity and effort involved in developing these functionalities justify the assigned story points. Successful completion of this user story lays a solid foundation for building trust with users by prioritizing their data security and authentication experience.
 
 #### Implement Single Sign-On
+
 **User Story:**
 As a user, I want to log in using my social media accounts so that I can access the application without having to create a new account.
 
@@ -90,7 +93,8 @@ As a user, I want to log in using my social media accounts so that I can access 
   - Successful login with the user's existing account
   - Error handling for failed SSO
 - **Estimated in Story Points:** 21
-
+- **Rationale:** Implementing Single Sign-On (SSO) enhances user convenience by allowing them to leverage their existing social media credentials to access the application. This feature requires integrating with multiple external authentication services securely. The estimated story points reflect the complexity of setting up robust backend support and ensuring seamless integration with the application's login functionality. By implementing SSO, we aim to streamline user access while maintaining the highest standards of security and user experience.
+  
 ### Profile Creation
 
 #### Design Profile Creation UI
@@ -109,8 +113,10 @@ As a new user, I want a simple, straightforward and user-friendly profile creati
   - Approval of the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
-
+- **Rationale:** The estimated 5 story points for designing the profile creation UI reflect the moderate complexity and effort required to create a user-friendly interface. Ensuring the interface is intuitive and easy to navigate, accommodating various user inputs such as personal information and photo uploads. Adapting the interface to different screen sizes and devices to maintain consistency and usability.
+  
 #### Develop Backend for Profile Creation
+
 **User Story:**
 As a user, I want the backend to be able to handle my profile data securely so that my personal information is stored safely and can be updated when needed.
 
@@ -129,8 +135,10 @@ As a user, I want the backend to be able to handle my profile data securely so t
   - Successful creation of user profile with valid data
   - Error handling for invalid data
 - **Estimated in Story Points:** 21
+- **Rationale:** The development of the backend for profile creation is essential for securely managing user profile data, ensuring it is stored safely and allowing for updates as needed. This involves implementing robust validation mechanisms for user input and integrating seamlessly with the database. Providing the option to link social media accounts enhances user convenience and engagement. This user story is estimated at 21 story points in JIRA, reflecting its complexity and the critical role it plays in establishing secure and functional user profiles within the application.
 
 #### Implement Profile Photo Upload
+
 **User Story:**
 As a user, I want to be able to upload a profile photo so that my account feels more personalized and identifiable.
 
@@ -145,6 +153,7 @@ As a user, I want to be able to upload a profile photo so that my account feels 
   - Successful upload and display of profile photo
   - Error handling for unsupported file formats and sizes
 - **Estimated in Story Points:** 21
+- **Rationale:** This task involves both frontend and backend components: developing a user-friendly interface for photo uploading on the frontend and establishing secure data handling on the backend. Given the complexity of ensuring seamless photo upload functionality, including error handling for various file formats and sizes, the effort required aligns with the allocated story points. 
 
 ### Messaging
 
@@ -163,6 +172,7 @@ As a user, I want an feasible messaging interface so that I can communicate effe
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
+- **Rationale**: The messaging UI design user story aims to create an intuitive interface facilitating effective user communication. It includes features like text input, multimedia options for voice notes, audio, and video calls, as well as notifications for new messages, all integrated into a responsive design framework. With an estimated 5 story points, this task is considered straightforward in terms of UI/UX design complexity and aligns with sprint priorities to enhance user engagement.
 
 #### Design Messaging Backend
 **User Story:**
@@ -180,7 +190,8 @@ As a user, I need the backend to securely and efficiently manage my messages, gu
   - Successful sending and receiving of messages
   - Secure message handling
 - **Estimated in Story Points:** 21
-
+- **Rationale**: The design and implementation of the messaging backend, estimated at 21 story points, are crucial for ensuring secure and efficient message management within the application. This user story addresses the need for real-time message updates, robust message storage in a database, and the creation of endpoints for sending and receiving messages.
+  
 ### Matching
 
 #### Design Matching UI
@@ -198,8 +209,10 @@ As a user, I want an engaging and intuitive matching interface so that I can fin
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
-
+- **Rationale**: The design of an engaging and intuitive matching interface is crucial for enhancing user engagement and facilitating connections based on shared interests. This user story involves implementing features like swipe interactions, profile display, and feedback mechanisms, all essential for creating a seamless user experience.
+  
 #### Creating Matching Algorithm
+
 **User Story:**
 As a user, I want a matching algorithm that considers my preferences so that I can receive relevant and compatible match suggestions.
 
@@ -214,6 +227,7 @@ As a user, I want a matching algorithm that considers my preferences so that I c
   - Algorithm returns accurate matches
   - Successfully displays match feedback when the users match each other
 - **Estimated in Story Points:** 8
+- **Rationale**: The Matching Algorithm user story, estimated at 8 story points, focuses on developing an algorithm to provide users with accurate and relevant match suggestions based on their specified preferences. This includes considerations such as adventure, skills, and behaviors within a defined distance range, ensuring that the algorithm effectively matches users who mutually align. 
 
 ### Social Media
 
@@ -231,6 +245,7 @@ As a user, I want an engaging and interactive social media interface so that I c
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
+- **Rationale**: Aiming to create an interactive interface where users can easily manage and display their linked social media accounts. This task includes ensuring a responsive design for seamless user interaction and receiving approval and feedback from stakeholders and team members to align with user expectations and platform goals.
 
 ### Database Design
 
@@ -247,8 +262,10 @@ As a system user, I want my personal information to be stored securely so that m
   - Approval from team members
   - Data is secured and organized successfully
 - **Estimated in Story Points:** 8
+- **Rationale**: Designing tables for Users, Preferences, and Profile, each estimated at 8 story points. These tasks collectively focus on organizing and securing user data efficiently. They are crucial for maintaining data integrity and accessibility, ensuring that user information, preferences, and profile details are stored securely and can be retrieved accurately as required by the application's functionalities.
 
 #### Design DB Table for Preferences
+
 **User Story:**
 As a user, I want my preferences to be stored efficiently so that the app can provide personalized recommendations based on my settings.
 
@@ -261,6 +278,7 @@ As a user, I want my preferences to be stored efficiently so that the app can pr
   - Approval from team members
   - Data is organized successfully
 - **Estimated in Story Points:** 8
+- **Rationale**: Preferences UI Design is estimated at 8 story points, emphasizing the creation of a user-friendly form for submitting and managing preferences. This involves designing a responsive interface with clear instructions and validation messages to streamline customization and enhance user experience on the platform.
 
 #### Design DB Table for Profile
 **User Story:**
@@ -275,7 +293,8 @@ As a system user, I want my profile information to be stored efficiently so that
   - Approval from team members
   - Data is secured and organized successfully
 - **Estimated in Story Points:** 8
-
+- **Rationale**: This task involves organizing profile data in a way that ensures accessibility and security, aligning closely with the application's architecture and security protocols. The estimation considers the complexity of database design and the need for approval from team members to ensure the data schema meets both functional requirements and security standards, supporting the overall reliability and scalability of the application.
+  
 ### Preferences
 
 #### Design UI Submit Form for Preferences
@@ -293,5 +312,11 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 8
-- **Sprint 1 Burndown Chart:**
-<img width="357" alt="Screenshot 2024-07-06 at 1 13 46 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/50bc24b2-5eb8-4440-ab36-4a3f6cff9ab0">
+- **Rationale**: This task encompasses designing responsive layouts, ensuring clear instructions, implementing validation messages, and obtaining necessary approvals. This effort is crucial as it complements foundational tasks like login functionalities, contributing to a seamless user experience and customization capability within the platform.
+
+### Sprint burndown 
+ <img width="358" alt="Screenshot 2024-07-06 at 3 41 54 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/b55083ae-fd68-4ac7-ac0c-338c029cd2e8">
+
+
+  
+  
