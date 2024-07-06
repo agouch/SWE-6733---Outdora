@@ -314,9 +314,41 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
 - **Estimated in Story Points:** 8
 - **Rationale**: This task encompasses designing responsive layouts, ensuring clear instructions, implementing validation messages, and obtaining necessary approvals. This effort is crucial as it complements foundational tasks like login functionalities, contributing to a seamless user experience and customization capability within the platform.
 
-### Sprint burndown 
- <img width="358" alt="Screenshot 2024-07-06 at 3 41 54 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/b55083ae-fd68-4ac7-ac0c-338c029cd2e8">
+- ####Sprint 1
+- ###Story Point Rationale
+- 
+- ###Sprint 1 Burndown Chart:
+<img width="357" alt="Screenshot 2024-07-06 at 1 13 46 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/50bc24b2-5eb8-4440-ab36-4a3f6cff9ab0">
 
+###Daily Scrum
+**What did you do in the last 24 hours that helped the Development Team meet the Sprint Goal?**
+Alaina: I planned the sprint review and retrospective, and finished the UI and firebase for the preferences component so that the user can now select preferences and the app will both retrieve and save the chosen preferences.
+Parker: Currently working on fixing SSO OAuth issues. Currently an error 402 occurs due to permissions being incorrect. 
+Aliyah: Add the remaining crucial aspects from Sprint One such as the detailed sprint burn down chart.
+Cesar: Prototyping and prepping for the Profile Creation UI design, ensuring it meets user-friendly standards.
+Nishik: Create a Profile DB Table for the application.
+
+**What will you do in the next 24 hours to help the Development Team meet the Sprint Goal?**
+Alaina: I will conduct the sprint review and retrospective to finish out the sprint and ensure everything is on track
+Parker: Continue to work on fixing sign on page sso and create tests. 
+Aliyah: Complete a rationale for each story point.
+Cesar: Start implementing the general structure of the Profile Component
+Nishik: Review the materials for submission and continue working on the backend of the app.
+
+**Do you see any impediment that prevents you or the Development Team from meeting the Sprint Goal? What are the impediments? What is your impediment removal plan?**
+Alaina: There are still quite a few tasks in progress or unstarted in the Jira with little time left to complete them. The team will continue to work on what they can to finish out the sprint requirements. As the product owner I also misunderstood the tech stack a bit and overestimated the requirements. After learning about the nature of react and firebase I don’t believe as much is required since there is no API and the database is more automatic. For the next sprint I will remove these impediments by assigning smaller tasks to complete given the scope and making it more clear what everyone’s task is.
+Parker: Currently sso is presenting an issue to the team we intend on working together to solve the problem as it is a cross platform issue. 
+Cesar: Due to the holiday weekend, there were unexpected conflicts with scheduled meeting times. As a result, some schedules had to be adjusted to accommodate the new meeting time.
+Aliyah: Specifically, I am still becoming familiar with Jira, and while I am diligently learning and exploring the application, this has slightly hampered my understanding of certain tasks. However, I am committed to overcoming this challenge by dedicating additional time to mastering Jira, seeking guidance from team members who are well-versed in the tool, and utilizing available resources to enhance my proficiency. 
+Nishik: I’m taking 4 summer classes so this week was extremely busy for me. Going forward, I want to manage my time well and dedicate time to working on the project. 
+
+###Pair Programming
+Parker: In collaboration with Alaina Magee, we worked on implementing the initial functionality of the Outdora app in react native. We successfully implemented a login screen with email and password authentication, as well as Google SSO using Firebase.  feature is not fully functional OAuth needs to be adjusted. Additionally, we created a registration screen for new users, ensuring they can sign up and have their profiles stored in Firestore. Alaina also played a key role in implementing the preferences screen, allowing users to update their profiles with detailed information such as first name, last name, username, age, birthday, and gender. Through pair programming Alaina helped me beautify the app. To streamline our development process and reduce the risk of introducing bugs into our main branch, we intend on establishing a staging branch workflow for testing new features before merging them into production.
+
+###App Demo
+Since we are using expo go and it is a local instance of the app that is not currently available publicly, we aren't able to provide a direct link to the app. However, there is a file in the repo called "App Demo Outdora" that displays our progress so far.
+
+###Sprint Review and Retrospective Link
 
   
   
