@@ -336,8 +336,8 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
 
 **Preferences**
 - **Rationale**: This task encompasses designing responsive layouts, ensuring clear instructions, implementing validation messages, and obtaining necessary approvals. This effort is crucial as it complements foundational tasks like login functionalities, contributing to a seamless user experience and customization capability within the platform.
-- 
-- ### Sprint 1 Burndown Chart:
+
+### Sprint 1 Burndown Chart:
 <img width="357" alt="Screenshot 2024-07-06 at 1 13 46 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/50bc24b2-5eb8-4440-ab36-4a3f6cff9ab0">
 
 ### Daily Scrum
