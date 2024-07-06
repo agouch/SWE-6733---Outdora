@@ -54,6 +54,7 @@ As a returning user, I want to see a visually appealing and intuitive login page
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
+- **Rationale:** 
 
 #### Develop Backend for Login
 **User Story:**
