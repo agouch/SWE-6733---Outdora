@@ -372,6 +372,22 @@ Since we are using expo go and it is a local instance of the app that is not cur
 https://youtu.be/su9lLiJVoLQ?si=yEbG1ZRWgJiJo4Go
 
 ### BDD / TDD Tests
+// BDD-style test
+  it('allows a user to log in with email and password', async () => {
+    signInWithEmailAndPassword.mockResolvedValue({ user: { uid: '123' } });
+    getDoc.mockResolvedValue({ exists: () => false });
+
+    const { getByTestId, getByText } = render(<LoginScreen navigation={mockNavigation} />);
+
+    fireEvent.changeText(getByTestId('email-input'), 'test@example.com');
+    fireEvent.changeText(getByTestId('password-input'), 'password123');
+    fireEvent.press(getByText('Continue with Email'));
+
+    await waitFor(() => {
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith({}, 'test@example.com', 'password123');
+      expect(mockNavigation.navigate).toHaveBeenCalledWith('Home');
+    });
+  });
 <img width="1728" alt="Screenshot 2024-07-07 at 2 32 22 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/1a92ca97-1ec2-4a7e-a0be-eeb7bddefff8">
 <img width="1728" alt="Screenshot 2024-07-07 at 2 30 17 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/1098ca34-38c6-4863-8e35-42a6e5e49bb7">
 
