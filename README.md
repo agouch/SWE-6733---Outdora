@@ -299,8 +299,8 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
   - Feedback from team members
 - **Estimated in Story Points:** 8
 
-- # Sprint 1
-- ### Story Point Rationale
+# Sprint 1
+### Story Point Rationale
 **Login Page**
 - **Rationale:** The task involves designing a login page that is both functional and aesthetically pleasing, incorporating essential features such as email/password fields, SSO options, and error messages. Given the moderate complexity of ensuring the page is user-friendly and responsive across different devices, this task is estimated at 5 story points.
 
