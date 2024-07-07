@@ -370,3 +370,8 @@ Since we are using expo go and it is a local instance of the app that is not cur
 
 ### Sprint Review and Retrospective Link
 https://youtu.be/su9lLiJVoLQ?si=yEbG1ZRWgJiJo4Go
+
+### BDD / TDD Tests
+<img width="1728" alt="Screenshot 2024-07-07 at 2 32 22 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/1a92ca97-1ec2-4a7e-a0be-eeb7bddefff8">
+<img width="1728" alt="Screenshot 2024-07-07 at 2 30 17 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/1098ca34-38c6-4863-8e35-42a6e5e49bb7">
+
