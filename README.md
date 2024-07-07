@@ -338,8 +338,7 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
 - **Rationale**: This task encompasses designing responsive layouts, ensuring clear instructions, implementing validation messages, and obtaining necessary approvals. This effort is crucial as it complements foundational tasks like login functionalities, contributing to a seamless user experience and customization capability within the platform.
 
 ### Sprint 1 Burndown Chart:
-<img width="357" alt="Screenshot 2024-07-06 at 1 13 46 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/50bc24b2-5eb8-4440-ab36-4a3f6cff9ab0">
-
+<img width="358" alt="Screenshot 2024-07-07 at 12 19 56 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/08fa86d1-6936-4a6b-9518-78b87eef58c4">
 ### Daily Scrum
 **What did you do in the last 24 hours that helped the Development Team meet the Sprint Goal?**
 Alaina: I planned the sprint review and retrospective, and finished the UI and firebase for the preferences component so that the user can now select preferences and the app will both retrieve and save the chosen preferences.
