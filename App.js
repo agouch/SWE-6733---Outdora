@@ -6,6 +6,7 @@ import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
 import PreferencesScreen, {Preferences} from './PreferencesScreen';
 import RegisterScreen from './RegisterScreen';
+import MessagingScreen from './MessagingScreen';
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ export default function App() {
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Preferences" component={PreferencesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Messages" component={MessagingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
