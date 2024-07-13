@@ -1,32 +1,45 @@
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import MessageInput from './components/MessageInput';
-import MessageBubble from './components/MessageBubble';
 
 const MessagingScreen = () => {
   const [messages, setMessages] = useState([]);
 
-  const handleSend = (message) => {
-    setMessages([...messages, { id: messages.length.toString(), text: message, ownMessage: true }]);
+  const handleSend = () => {
+    if (message.trim()) {
+      onSend(message);
+      setMessage('');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={messages}
-        renderItem={({ item }) => <MessageBubble message={item.text} isOwnMessage={item.ownMessage} />}
-        keyExtractor={(item) => item.id}
+      <TextInput
+        style={styles.input}
+        placeholder="Type a message"
+        value={message}
+        onChangeText={setMessage}
       />
-      <MessageInput onSend={handleSend} />
+      <Button title="Send" onPress={handleSend} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+  },
+  input: {
     flex: 1,
-    backgroundColor: '#dfdcd4',
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    marginRight: 8,
   },
 });
 
-export default MessagingScreen;
+export default MessageInput;
