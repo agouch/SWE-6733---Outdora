@@ -25,7 +25,7 @@ const MessagingScreen = () => {
 const styles = StyleSheet.create ({
     container: {
         flex: 1,
-        backgroundColor: #dfdcd4,
+        backgroundColor: '#dfdcd4',
 
  },
 });
