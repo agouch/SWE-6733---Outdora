@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - echo Installing dependencies...
+      - npm install -g expo-cli
+      - npm install
+  build:
+    commands:
+      - echo Build started on `date`
+      - npx expo start --no-dev --minify
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - "**/*"
+  discard-paths: yes
