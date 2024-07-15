@@ -19,19 +19,23 @@ export default function LoginScreen({ navigation }) {
     redirectUri: 'https://auth.expo.io/@parkerg16/outdora',
   });
 
-  useEffect(() => {
+  const handleGoogleLogin = async (response) => {
     if (response?.type === 'success') {
       const { id_token } = response.params;
-
       const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential)
-        .then(userCredential => {
-          createUserProfile(userCredential.user);
-        })
-        .catch(error => {
-          console.error(error);
-          setError('Google Sign-In failed');
-        });
+      try {
+        const userCredential = await signInWithCredential(auth, credential);
+        await createUserProfile(userCredential.user);
+      } catch (error) {
+        console.error(error);
+        setError('Google Sign-In failed');
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (response) {
+      handleGoogleLogin(response);
     }
   }, [response]);
 
@@ -85,6 +89,10 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
+  const handleRegister = () => {
+    navigation.navigate('Register');
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -93,7 +101,7 @@ export default function LoginScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.container}>
+          <View style={styles.container} testID="login-screen" handleGoogleLogin={handleGoogleLogin}>
             <Image source={require('./assets/Outdora.png')} style={styles.logo} />
             <Text style={styles.title}>Discover Possibilities with Outdora</Text>
             <Text style={styles.subtitle}>
@@ -108,6 +116,7 @@ export default function LoginScreen({ navigation }) {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              testID="email-input"
             />
             <View style={styles.passwordContainer}>
               <TextInput
@@ -117,23 +126,29 @@ export default function LoginScreen({ navigation }) {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!passwordVisible}
+                testID="password-input"
               />
               <TouchableOpacity
                 style={styles.viewPasswordButton}
                 onPress={() => setPasswordVisible(!passwordVisible)}
+                testID="password-visibility-toggle"
               >
                 <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={24} color="gray" />
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <TouchableOpacity style={styles.button} onPress={handleLogin} testID="login-button">
               <Text style={styles.buttonText}>Continue with Email</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.button}
+              style={styles.googleButton}
               onPress={() => promptAsync()}
               disabled={!request}
+              testID="google-login-button"
             >
               <Text style={styles.buttonText}>Continue with Google</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.registerButton} onPress={handleRegister} testID="register-button">
+              <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
@@ -141,7 +156,6 @@ export default function LoginScreen({ navigation }) {
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -208,8 +222,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  googleButton: {
+    width: '80%',
+    padding: 15,
+    backgroundColor: '#4285F4',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
   error: {
     color: 'red',
     marginBottom: 10,
+  },
+  registerButton: {
+    width: '80%',
+    padding: 15,
+    backgroundColor: '#34A853',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+
+  },
+  registerButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

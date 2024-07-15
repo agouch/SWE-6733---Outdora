@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { auth } from './firebaseConfig';
 
+
 export default function HomeScreen({ navigation }) {
   const handleLogout = () => {
     auth.signOut().then(() => {

@@ -56,6 +56,7 @@ As a returning user, I want to see a visually appealing and intuitive login page
 - **Estimated in Story Points:** 5
 
 #### Develop Backend for Login
+
 **User Story:**
 As a user, I want a secure and reliable backend for login so that my personal information stays protected during the authentication process.
 
@@ -74,6 +75,7 @@ As a user, I want a secure and reliable backend for login so that my personal in
 - **Estimated in Story Points:** 21
 
 #### Implement Single Sign-On
+
 **User Story:**
 As a user, I want to log in using my social media accounts so that I can access the application without having to create a new account.
 
@@ -108,8 +110,9 @@ As a new user, I want a simple, straightforward and user-friendly profile creati
   - Approval of the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 5
-
+  
 #### Develop Backend for Profile Creation
+
 **User Story:**
 As a user, I want the backend to be able to handle my profile data securely so that my personal information is stored safely and can be updated when needed.
 
@@ -130,6 +133,7 @@ As a user, I want the backend to be able to handle my profile data securely so t
 - **Estimated in Story Points:** 21
 
 #### Implement Profile Photo Upload
+
 **User Story:**
 As a user, I want to be able to upload a profile photo so that my account feels more personalized and identifiable.
 
@@ -199,6 +203,7 @@ As a user, I want an engaging and intuitive matching interface so that I can fin
 - **Estimated in Story Points:** 5
 
 #### Creating Matching Algorithm
+
 **User Story:**
 As a user, I want a matching algorithm that considers my preferences so that I can receive relevant and compatible match suggestions.
 
@@ -248,6 +253,7 @@ As a system user, I want my personal information to be stored securely so that m
 - **Estimated in Story Points:** 8
 
 #### Design DB Table for Preferences
+
 **User Story:**
 As a user, I want my preferences to be stored efficiently so that the app can provide personalized recommendations based on my settings.
 
@@ -292,3 +298,81 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
   - Approval from the Product Owner
   - Feedback from team members
 - **Estimated in Story Points:** 8
+
+# Sprint 1
+### Story Point Rationale
+**Login Page**
+- **Rationale:** The task involves designing a login page that is both functional and aesthetically pleasing, incorporating essential features such as email/password fields, SSO options, and error messages. Given the moderate complexity of ensuring the page is user-friendly and responsive across different devices, this task is estimated at 5 story points.
+
+**Develop Backend for Login:**
+- **Rationale:** The implementation of a secure backend for user login is critical to ensuring the protection of user data and maintaining a seamless user experience. This task involves integrating robust validation mechanisms, establishing secure database interactions, and implementing error handling to enhance security and usability. The complexity and effort involved in developing these functionalities justify the assigned story points. Successful completion of this user story lays a solid foundation for building trust with users by prioritizing their data security and authentication experience
+
+**Implementation of Single Sign-On**
+- **Rationale:** Implementing Single Sign-On (SSO) enhances user convenience by allowing them to leverage their existing social media credentials to access the application. This feature requires integrating with multiple external authentication services securely. The estimated story points reflect the complexity of setting up robust backend support and ensuring seamless integration with the application's login functionality. By implementing SSO, we aim to streamline user access while maintaining the highest standards of security and user experience
+
+**Design Profile Creation UI**
+- **Rationale:** Designing the profile creation UI involves ensuring the interface is intuitive and easy to navigate, accommodating various user inputs such as personal information and photo uploads. Adapting the interface to different screen sizes and devices to maintain consistency and usability. Given the moderate complexity and effort required to create a user-friendly interface, this task is estimated at 5 story points.
+
+**Develop Backend for Profile Creation**
+- **Rationale:** The development of the backend for profile creation is essential for securely managing user profile data, ensuring it is stored safely and allowing for updates as needed. This involves implementing robust validation mechanisms for user input and integrating seamlessly with the database. Providing the option to link social media accounts enhances user convenience and engagement. This user story is estimated at 21 story points, reflecting its complexity and the critical role it plays in establishing secure and functional user profiles within the application.
+
+**Implementation of Profile Photo Upload**
+- **Rationale:** This task involves both developing a user-friendly interface for photo uploading and establishing secure data handling using firebase. Given the complexity of ensuring seamless photo upload functionality, including error handling for various file formats and sizes, the effort required aligns with the allocated story points. 
+
+**Messaging**
+- **Rationale**: The messaging UI design user story aims to create an intuitive interface facilitating effective user communication. It includes features like text input, multimedia options for voice notes, audio, and video calls, as well as notifications for new messages, all integrated into a responsive design framework. With an estimated 5 story points, this task is considered straightforward in terms of UI/UX design complexity and aligns with project priorities to enhance user engagement.
+
+**Design Messaging Backend**
+- **Rationale**: The design and implementation of the messaging backend, estimated at 21 story points, are crucial for ensuring secure and efficient message management within the application. This user story addresses the need for real-time message updates, robust message storage in a database, and the creation of endpoints for sending and receiving messages.
+
+**Matching Algorithm**
+- **Rationale**: Creating an engaging and intuitive matching interface is essential for fostering user engagement and facilitating meaningful connections. This user story entails implementing features such as swipe interactions, profile displays, and feedback mechanisms to ensure a seamless user experience. The matching algorithm is designed to provide accurate and relevant match suggestions based on user-specified preferences, including interests, skills, and behaviors, within a specified distance range. This ensures that the algorithm effectively connects users who share mutual interests and align well with each other.
+
+**Social Media**
+- **Rationale**: Aiming to create an interactive interface where users can easily manage and display their linked social media accounts. This task includes ensuring a responsive design for seamless user interaction and receiving approval and feedback from stakeholders and team members to align with user expectations and platform goals.
+
+**Database Design**
+- **Rationale**: Designing tables for Users, Preferences, and Profile, each estimated at 8 story points. These tasks collectively focus on organizing and securing user data efficiently. They are crucial for maintaining data integrity and accessibility, ensuring that user information, preferences, and profile details are stored securely and can be retrieved accurately as required by the application's functionalities.
+
+**Preferences**
+- **Rationale**: This task encompasses designing responsive layouts, ensuring clear instructions, implementing validation messages, and obtaining necessary approvals. This effort is crucial as it complements foundational tasks like login functionalities, contributing to a seamless user experience and customization capability within the platform.
+
+### Sprint 1 Burndown Chart:
+<img width="358" alt="Screenshot 2024-07-07 at 12 19 56 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/148926371/08fa86d1-6936-4a6b-9518-78b87eef58c4">
+
+### Daily Scrum
+**What did you do in the last 24 hours that helped the Development Team meet the Sprint Goal?**
+Alaina: I planned the sprint review and retrospective, and finished the UI and firebase for the preferences component so that the user can now select preferences and the app will both retrieve and save the chosen preferences.
+Parker: Currently working on fixing SSO OAuth issues. Currently an error 402 occurs due to permissions being incorrect. 
+Aliyah: Add the remaining crucial aspects from Sprint One such as the detailed sprint burn down chart.
+Cesar: Prototyping and prepping for the Profile Creation UI design, ensuring it meets user-friendly standards.
+Nishik: Create a Profile DB Table for the application.
+
+**What will you do in the next 24 hours to help the Development Team meet the Sprint Goal?**
+Alaina: I will conduct the sprint review and retrospective to finish out the sprint and ensure everything is on track
+Parker: Continue to work on fixing sign on page sso and create tests. 
+Aliyah: Complete a rationale for each story point.
+Cesar: Start implementing the general structure of the Profile Component
+Nishik: Review the materials for submission and continue working on the backend of the app.
+
+**Do you see any impediment that prevents you or the Development Team from meeting the Sprint Goal? What are the impediments? What is your impediment removal plan?**
+Alaina: There are still quite a few tasks in progress or unstarted in the Jira with little time left to complete them. The team will continue to work on what they can to finish out the sprint requirements. As the product owner I also misunderstood the tech stack a bit and overestimated the requirements. After learning about the nature of react and firebase I don’t believe as much is required since there is no API and the database is more automatic. For the next sprint I will remove these impediments by assigning smaller tasks to complete given the scope and making it more clear what everyone’s task is.
+Parker: Currently sso is presenting an issue to the team we intend on working together to solve the problem as it is a cross platform issue. 
+Cesar: Due to the holiday weekend, there were unexpected conflicts with scheduled meeting times. As a result, some schedules had to be adjusted to accommodate the new meeting time.
+Aliyah: Specifically, I am still becoming familiar with Jira, and while I am diligently learning and exploring the application, this has slightly hampered my understanding of certain tasks. However, I am committed to overcoming this challenge by dedicating additional time to mastering Jira, seeking guidance from team members who are well-versed in the tool, and utilizing available resources to enhance my proficiency. 
+Nishik: I’m taking 4 summer classes so this week was extremely busy for me. Going forward, I want to manage my time well and dedicate time to working on the project. 
+
+### Pair Programming
+Parker: In collaboration with Alaina Magee, we worked on implementing the initial functionality of the Outdora app in react native. We successfully implemented a login screen with email and password authentication, as well as Google SSO using Firebase.  feature is not fully functional OAuth needs to be adjusted. Additionally, we created a registration screen for new users, ensuring they can sign up and have their profiles stored in Firestore. Alaina also played a key role in implementing the preferences screen, allowing users to update their profiles with detailed information such as first name, last name, username, age, birthday, and gender. Through pair programming Alaina helped me beautify the app. To streamline our development process and reduce the risk of introducing bugs into our main branch, we intend on establishing a staging branch workflow for testing new features before merging them into production.
+
+### App Demo
+Since we are using expo go and it is a local instance of the app that is not currently available publicly, we aren't able to provide a direct link to the app. However, there is a file in the repo called "App Demo Outdora" that displays our progress so far.
+
+### Sprint Review and Retrospective Link
+https://youtu.be/su9lLiJVoLQ?si=yEbG1ZRWgJiJo4Go
+
+### BDD / TDD Tests
+<img width="1728" alt="Screenshot 2024-07-07 at 2 32 22 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/1a92ca97-1ec2-4a7e-a0be-eeb7bddefff8">
+<img width="1728" alt="Screenshot 2024-07-07 at 2 30 17 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/fcb2f3bc-1791-4fd7-a5de-ad7768f925b0">
+
+
