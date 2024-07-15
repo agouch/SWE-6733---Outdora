@@ -375,4 +375,33 @@ https://youtu.be/su9lLiJVoLQ?si=yEbG1ZRWgJiJo4Go
 <img width="1728" alt="Screenshot 2024-07-07 at 2 32 22 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/1a92ca97-1ec2-4a7e-a0be-eeb7bddefff8">
 <img width="1728" alt="Screenshot 2024-07-07 at 2 30 17 PM" src="https://github.com/agouch/SWE-6733---Outdora/assets/61159383/fcb2f3bc-1791-4fd7-a5de-ad7768f925b0">
 
+# Sprint 2
+
+## Continuous Integration (CI) Setup
+
+### Rationale for Using AWS CodeBuild
+
+We chose AWS CodeBuild as our CI tool for the following reasons:
+
+1. **Scalability**: AWS CodeBuild scales automatically to handle multiple builds concurrently.
+2. **Integration with AWS Services**: Seamless integration with other AWS services, which is beneficial for future deployment processes.
+3. **Managed Service**: As a fully managed build service, AWS CodeBuild reduces the overhead of maintaining build servers.
+4. **Cost-Effective**: Pay-as-you-go pricing model ensures that we only pay for the build time we use, making it cost-effective for our project.
+
+### CI Workflow
+
+We have set up a CI workflow that automatically builds our code and executes tests every time we merge to the `main` branch. This ensures that our codebase remains stable and all changes are properly validated.
+
+#### Workflow Steps
+
+1. **Checkout Code**: The workflow checks out the code from the repository.
+2. **Set Up Node.js**: The workflow sets up Node.js version 18.
+3. **Install Dependencies**: The workflow installs project dependencies using `npm install`.
+4. **Validate Expo Project**: The workflow runs `npx expo-doctor` to validate the Expo project setup.
+5. **Run Tests**: The workflow executes tests using `npm test`.
+
+### Evidence of CI Setup
+
+![Rebuild Every Time Code Change Is Pushed](https://github.com/user-attachments/assets/2cacb8e1-420c-4f3b-9d7a-558463218a07)
+![Build Succeeded](https://github.com/user-attachments/assets/03ae2a3c-e1ca-4734-829e-b265e7f79327)
 
