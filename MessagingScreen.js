@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import MessageInput from './components/MessageInput';
-import MessageBubble from './components/MessageBubble';
+import MessageInput from './MessageInput';
+import MessageBubble from './MessageBubble';
 
 const MessagingScreen = () => {
   const [messages, setMessages] = useState([]);
