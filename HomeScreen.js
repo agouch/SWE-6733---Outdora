@@ -21,9 +21,16 @@ export default function HomeScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Preferences')}>
         <Text style={styles.buttonText}>Change Preferences</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Messages')}>
+        <Text style={styles.buttonText}>Messages</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Matching')}>
+        <Text style={styles.buttonText}>Matching</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+      
     </View>
   );
 }
