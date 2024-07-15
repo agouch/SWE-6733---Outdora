@@ -5,13 +5,15 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
+      - echo Increasing file watchers limit...
+      - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - echo Installing dependencies...
       - npm install -g expo-cli
       - npm install
   build:
     commands:
       - echo Build started on `date`
-      - npx expo start --no-dev --minify
+      - npx expo start --no-dev --minify || npm run build
   post_build:
     commands:
       - echo Build completed on `date`
