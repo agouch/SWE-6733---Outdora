@@ -6,7 +6,7 @@ phases:
       nodejs: 18
     commands:
       - echo Increasing file watchers limit...
-      - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - echo fs.inotify.max_user_watches=524288 | tee -a /proc/sys/fs/inotify/max_user_watches
       - echo Installing dependencies...
       - npm install -g expo-cli
       - npm install
