@@ -5,15 +5,13 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo Increasing file watchers limit...
-      - echo fs.inotify.max_user_watches=524288 | tee -a /proc/sys/fs/inotify/max_user_watches
       - echo Installing dependencies...
       - npm install -g expo-cli
       - npm install
   build:
     commands:
       - echo Build started on `date`
-      - npx expo start --no-dev --minify || npm run build
+      - npm run build || npx expo start --no-dev --minify
   post_build:
     commands:
       - echo Build completed on `date`
