@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import MessageInput from './MessageInput';
 import MessageBubble from './MessageBubble';
 
@@ -11,6 +11,12 @@ const MessagingScreen = () => {
   };
 
   return (
+    <KeyboardAvoidingView 
+
+    style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}>
+
     <View style={styles.container}>
         <FlatList
             data={messages} 
@@ -18,7 +24,7 @@ const MessagingScreen = () => {
             keyExtractor={(item) => item.id}
             />
             <MessageInput onSend={handleSend} />
-            </View>
+            </KeyboardAvoidingView>
   );
 };
 
