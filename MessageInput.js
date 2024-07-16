@@ -10,6 +10,7 @@ const MessageInput = ({ onSend }) => {
       setMessage('');
     }
   };
+  
 
   return (
     <View style={styles.container}>
