@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 
-const MessageInput = ({ onSend }) => {
+const MessageInput = ({ onSend, autoFocus }) => {
   const [message, setMessage] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [autoFocus]);
 
   const handleSend = () => {
     if (message.trim()) {
@@ -14,10 +21,12 @@ const MessageInput = ({ onSend }) => {
   return (
     <View style={styles.container}>
       <TextInput
+        ref={inputRef}
         style={styles.input}
         placeholder="Type a message"
         value={message}
         onChangeText={setMessage}
+        keyboardAppearance="dark" 
       />
       <Button title="Send" onPress={handleSend} />
     </View>
