@@ -8,6 +8,8 @@ import PreferencesScreen, {Preferences} from './PreferencesScreen';
 import RegisterScreen from './RegisterScreen';
 import MessagingScreen from './MessagingScreen';
 import ChatListScreen from './ChatListScreen';
+import MatchingScreen from './MatchingScreen';
+
 
 const Stack = createStackNavigator();
 
@@ -22,6 +24,8 @@ export default function App() {
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ChatList" component={ChatListScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Messages" component={MessagingScreen} />
+        <Stack.Screen name="Matching" component={MatchingScreen} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
