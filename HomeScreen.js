@@ -24,9 +24,6 @@ export default function HomeScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChatList')}>
         <Text style={styles.buttonText}>My Matches</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Messages')}>
-        <Text style={styles.buttonText}>Messages</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Matching')}>
         <Text style={styles.buttonText}>Matching</Text>
       </TouchableOpacity>
