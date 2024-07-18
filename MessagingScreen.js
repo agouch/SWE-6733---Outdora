@@ -2,37 +2,42 @@ import React, {useEffect, useState } from 'react';
 import { View, FlatList, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import MessageInput from './MessageInput';
 import MessageBubble from './MessageBubble';
-import { firestore } from './firebaseConfig';
-import firebase from 'firebase/app'; 
+import {auth, firestore} from './firebaseConfig'
+import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
 
-//this is the screen that the user is routed to after clicking on a match. it's essentially a chat with the matched user
+//this is the screen that the user is routed to after clicking on a match. it's a chat with the matched user
 const MessagingScreen = ({ route }) => {
-  const { chatId } = route.params;
+  const { matchId } = route.params;
+  
   const [messages, setMessages] = useState([]);
-
+  const user = auth.currentUser;
 
   useEffect(() => {
-    const unsubscribe = firestore
-      .collection('chats')
-      .doc(chatId)
-      .collection('messages')
-      .orderBy('timestamp', 'asc')
-      .onSnapshot(snapshot => {
-        setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      });
+    if (!matchId) {
+      console.error('matchId is undefined');
+      return;
+    }
+    const q = query(
+      collection(firestore, 'chats', matchId, 'messages'),
+      orderBy('timestamp', 'asc')
+    );
+    const unsubscribe = onSnapshot(q, snapshot => {
+      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
 
     return () => unsubscribe();
-  }, [chatId]);
+  }, [matchId]);
   
-  const handleSend = (message) => {
-    firestore.collection('chats')
-      .doc(chatId)
-      .collection('messages')
-      .add({
+  const handleSend = async (message) => {
+    try {
+      await addDoc(collection(firestore, 'chats', matchId, 'messages'), {
         text: message,
-        senderId: 'currentUserUID', 
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        senderId: user.uid, 
+        timestamp: serverTimestamp(),
       });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   };
   return (
     <KeyboardAvoidingView 

@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.11.5",
     "@expo/metro-runtime": "~3.2.1",
     "@mui/material": "^5.15.21",
-    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-firebase/auth": "^20.1.0",
     "@react-native-firebase/firestore": "^20.1.0",
