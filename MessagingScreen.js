@@ -35,7 +35,6 @@ const MessagingScreen = ({ route }) => {
       console.error('Error listening to messages:', error);
     });
 
-    // Cleanup function
     return () => unsubscribe();
   }, [matchId, user.uid, recipientId]);
 
@@ -89,9 +88,6 @@ const MessagingScreen = ({ route }) => {
         await updateDoc(recipientRef, {
           matches: updatedRecipientMatches
         });
-
-        // We don't need to manually update the messages state here
-        // as the onSnapshot listener will handle this for us
       }
     } catch (error) {
       console.error("Error adding message: ", error);
@@ -99,12 +95,11 @@ const MessagingScreen = ({ route }) => {
     }
   };
 
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>

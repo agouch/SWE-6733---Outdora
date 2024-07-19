@@ -17,7 +17,6 @@ const MessageInput = ({ onSend, autoFocus }) => {
       setMessage('');
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -27,7 +26,7 @@ const MessageInput = ({ onSend, autoFocus }) => {
         placeholder="Type a message"
         value={message}
         onChangeText={setMessage}
-        keyboardAppearance="dark" 
+        keyboardAppearance="dark"
       />
       <Button title="Send" onPress={handleSend} />
     </View>
