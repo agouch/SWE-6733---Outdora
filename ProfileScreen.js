@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Button } from 'react-native';
 import { auth, firestore, storage } from './firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
+
+import ImageViewer from './components/ImageViewer';
+const PlaceholderImage = require('./assets/ProfilePlaceholderImage.png');
 
 export default function ProfileScreen({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -15,8 +18,8 @@ export default function ProfileScreen({ navigation }) {
   const [gender, setGender] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [preferences, setPreferences] = useState('');
-  const [imageUri, setImageUri] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState('');
 
   const user = auth.currentUser;
 
@@ -36,7 +39,7 @@ export default function ProfileScreen({ navigation }) {
           setGender(userData.gender || '');
           setDisplayName(userData.displayName || '');
           setPreferences(userData.preferences || '');
-          setImageUri(userData.imageUri || '');
+          setSelectedImage(userData.selectedImage || '');
         }
         setLoading(false);
       } catch (error) {
@@ -60,7 +63,7 @@ export default function ProfileScreen({ navigation }) {
         gender,
         displayName,
         preferences,
-        imageUri
+        selectedImage
       }, { merge: true });
 
       Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
@@ -90,17 +93,17 @@ export default function ProfileScreen({ navigation }) {
     );
   };
 
-  const handleSelectImage = () => {
-    launchImageLibrary({ mediaType: 'photo' }, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.error('ImagePicker Error: ', response.error);
-      } else if (response.assets && response.assets.length > 0) {
-        const selectedImage = response.assets[0];
-        setImageUri(selectedImage.uri);
-      }
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
     });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      alert('You did not select any image.');
+    }
   };
 
   if (loading) {
@@ -114,12 +117,11 @@ export default function ProfileScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Update Profile</Text>
-      <TouchableOpacity onPress={handleSelectImage} style={styles.imageContainer}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.image} />
-        ) : (
-          <Text style={styles.imagePlaceholder}>Select Image</Text>
-        )}
+      <TouchableOpacity onPress={pickImageAsync} style={styles.imageContainer}>
+        <ImageViewer
+          placeholderImageSource={PlaceholderImage}
+          selectedImage={selectedImage}
+        />
       </TouchableOpacity>
       <TextInput
         style={styles.input}
