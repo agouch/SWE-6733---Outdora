@@ -9,7 +9,7 @@ import RegisterScreen from './RegisterScreen';
 import MessagingScreen from './MessagingScreen';
 import ChatListScreen from './ChatListScreen';
 import MatchingScreen from './MatchingScreen';
-
+import 'react-native-get-random-values';
 
 const Stack = createStackNavigator();
 
