@@ -53,7 +53,6 @@ const ChatList = ({ currentUser }) => {
           data={matches}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
-            console.log('Rendering item:', item); 
             return (
               <TouchableOpacity
                 onPress={() => navigation.navigate('Messages', { matchId: item.id })}

@@ -22,7 +22,9 @@ const MessagingScreen = ({ route }) => {
       orderBy('timestamp', 'asc')
     );
     const unsubscribe = onSnapshot(q, snapshot => {
-      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const fetchedMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log('Fetched messages:', fetchedMessages); 
+      setMessages(fetchedMessages);
     });
 
     return () => unsubscribe();
@@ -39,6 +41,7 @@ const MessagingScreen = ({ route }) => {
       console.error("Error adding document: ", error);
     }
   };
+
   return (
     <KeyboardAvoidingView 
       style={styles.container}
