@@ -325,9 +325,6 @@ As a user, I want a simple and intuitive form to submit my preferences so that I
 **Design Messaging Backend**
 - **Rationale**: The design and implementation of the messaging backend, estimated at 21 story points, are crucial for ensuring secure and efficient message management within the application. This user story addresses the need for real-time message updates, robust message storage in a database, and the creation of endpoints for sending and receiving messages.
 
-**Matching Algorithm**
-- **Rationale**: Creating an engaging and intuitive matching interface is essential for fostering user engagement and facilitating meaningful connections. This user story entails implementing features such as swipe interactions, profile displays, and feedback mechanisms to ensure a seamless user experience. The matching algorithm is designed to provide accurate and relevant match suggestions based on user-specified preferences, including interests, skills, and behaviors, within a specified distance range. This ensures that the algorithm effectively connects users who share mutual interests and align well with each other.
-
 **Social Media**
 - **Rationale**: Aiming to create an interactive interface where users can easily manage and display their linked social media accounts. This task includes ensuring a responsive design for seamless user interaction and receiving approval and feedback from stakeholders and team members to align with user expectations and platform goals.
 
@@ -404,4 +401,5 @@ We have set up a CI workflow that automatically builds our code and executes tes
 
 ![Rebuild Every Time Code Change Is Pushed](https://github.com/user-attachments/assets/2cacb8e1-420c-4f3b-9d7a-558463218a07)
 ![Build Succeeded](https://github.com/user-attachments/assets/03ae2a3c-e1ca-4734-829e-b265e7f79327)
+
 
