@@ -4,7 +4,6 @@ import MatchingScreen from '../MatchingScreen';
 import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth } from '../firebaseConfig';
 
-// Mock the dependencies
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'unique-id'),
 }));

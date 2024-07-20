@@ -53,7 +53,7 @@ const MessagingScreen = ({ route }) => {
       text: message,
       timestamp: new Date().toISOString()
     };
-
+    console.log('New message:', newMessage);
     try {
       const userRef = doc(firestore, 'users', user.uid);
       const recipientRef = doc(firestore, 'users', recipientId);

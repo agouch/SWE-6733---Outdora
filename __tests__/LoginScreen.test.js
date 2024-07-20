@@ -5,7 +5,6 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } 
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import * as Google from 'expo-auth-session/providers/google';
 
-// Mock the dependencies
 jest.mock('../firebaseConfig', () => ({
   auth: {},
   firestore: {},
@@ -98,13 +97,10 @@ describe('LoginScreen', () => {
     getDoc.mockResolvedValue({ exists: () => false });
   
     const { getByTestId } = render(<LoginScreen navigation={mockNavigation} />);
-  
-    // Simulate Google login response
     await act(async () => {
-      // Trigger the Google login
+
       fireEvent.press(getByTestId('google-login-button'));
   
-      // Manually call the useEffect hook
       const { useAuthRequest } = require('expo-auth-session/providers/google');
       const [,, promptAsync] = useAuthRequest.mock.results[0].value;
       await promptAsync();
