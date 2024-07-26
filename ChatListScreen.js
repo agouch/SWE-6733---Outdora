@@ -78,6 +78,12 @@ const ChatListScreen = () => {
           }}
         />
       )}
+    <TouchableOpacity
+      style={styles.homeButton}
+      onPress={() => navigation.navigate('Home')}
+      >
+        <Text style={styles.homeButtonText}>Back</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -109,6 +115,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
+homeButton: {
+  backgroundColor: '#b28a68',
+  padding: 16,
+  marginVertical: 8,
+  width: '100%',
+  alignItems: 'center',
+  borderRadius: 8,
+  marginTop: 20, 
+},
+homeButtonText: {
+  color: '#fff',
+  fontSize: 18,
+},
 });
 
 export default ChatListScreen;
