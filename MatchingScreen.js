@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, InteractionManager } from 'react-native';
+import { View, Text, StyleSheet, Alert, InteractionManager } from 'react-native';
+import Swiper from 'react-native-deck-swiper';
 import { auth, firestore } from './firebaseConfig';
 import { collection, getDocs, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,7 +17,6 @@ const MatchingScreen = ({ navigation }) => {
       try {
         const currentUserRef = doc(firestore, 'users', user.uid);
         const currentUserDoc = await getDoc(currentUserRef);
-
         if (currentUserDoc.exists()) {
           const currentUserData = currentUserDoc.data();
           if (currentUserData.matches && Array.isArray(currentUserData.matches) && currentUserData.matches.length > 0) {
@@ -24,6 +24,7 @@ const MatchingScreen = ({ navigation }) => {
               setMatches(currentUserData.matches);
               setLoading(false);
             });
+
           } else {
             const usersCollection = collection(firestore, 'users');
             const usersSnapshot = await getDocs(usersCollection);
@@ -53,25 +54,34 @@ const MatchingScreen = ({ navigation }) => {
                 otherRegion === currentRegion
               );
             });
-
-            const matchesWithUsersAndChats = filteredMatches.map(match => ({
-              id: uuidv4(),
-              username: match.username,
-              users: [user.uid, match.id],
-              chats: []
-            }));
-
+            const matchesWithUsersAndChats = filteredMatches.map(match => {
+              const matchData = {
+                id: uuidv4(),
+                username: match.username,
+                firstname: "match.firstname",
+                age: match.age,
+                gender: match.gender,
+                users: [user.uid, match.id],
+                chats: []
+              };
+              console.log('Match Data:', matchData);
+              return matchData;
+            });
             // Update current user's matches
             await updateDoc(currentUserRef, { matches: matchesWithUsersAndChats }, { merge: true });
-
             // Update matches for other users
             for (const match of matchesWithUsersAndChats) {
               await updateMatchForOtherUser(match.users[1], {
                 id: match.id,
                 username: currentUserData.username || user.email,
+                firstname: currentUserData.firstname,
+                age: currentUserData.age,
+                gender: currentUserData.gender,
                 users: [match.users[1], user.uid],
                 chats: []
               });
+              
+              await updateMatchForOtherUser(match.users[1], reciprocalMatchData);
             }
 
             InteractionManager.runAfterInteractions(() => {
@@ -113,7 +123,9 @@ const MatchingScreen = ({ navigation }) => {
     }
   };
 
-  const handleMatchClick = async (match) => {
+  const handleSwipeRight = async (cardIndex) => {
+    const match = matches[cardIndex];
+
     const currentUserRef = doc(firestore, 'users', user.uid);
     const matchUserRef = doc(firestore, 'users', match.id);
 
@@ -162,6 +174,9 @@ const MatchingScreen = ({ navigation }) => {
       const matchData = {
         id: matchId,
         username: match.username,
+        firstname: match.firstname,
+        age: match.age,
+        gender: match.gender,
         users: [user.uid, match.id],
         chats: []
       };
@@ -169,6 +184,9 @@ const MatchingScreen = ({ navigation }) => {
       const reciprocalMatchData = {
         id: matchId,
         username: user.displayName || user.email,
+        firstname: currentUserData.firstname,
+        age: currentUserData.age,
+        gender: currentUserData.gender,
         users: [match.id, user.uid],
         chats: []
       };
@@ -201,10 +219,13 @@ const MatchingScreen = ({ navigation }) => {
     }
   };
 
-  const renderMatch = ({ item }) => (
-    <TouchableOpacity style={styles.match} onPress={() => handleMatchClick(item)}>
-      <Text style={styles.matchText}>Username: {item.username || 'N/A'}</Text>
-    </TouchableOpacity>
+  const renderCard = (item) => (
+    <View style={styles.card}>
+      <Text style={styles.cardText}>Username: {item.username || 'N/A'}</Text>
+      <Text style={styles.cardText}>First Name: {item.firstname || 'N/A'}</Text>
+      <Text style={styles.cardText}>Age: {item.age || 'N/A'}</Text>
+      <Text style={styles.cardText}>Gender: {item.gender || 'N/A'}</Text>
+    </View>
   );
 
   if (loading) {
@@ -218,11 +239,14 @@ const MatchingScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Matches</Text>
-      <FlatList
-        data={matches}
-        renderItem={renderMatch}
-        keyExtractor={item => item.id}
-        ListEmptyComponent={<Text>No matches found.</Text>}
+      <Swiper
+        cards={matches}
+        renderCard={renderCard}
+        onSwipedRight={(cardIndex) => handleSwipeRight(cardIndex)}
+        onSwipedLeft={() => {}}
+        cardIndex={0}
+        backgroundColor={'#f9f9f9'}
+        stackSize={3}
       />
     </View>
   );
@@ -239,7 +263,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  match: {
+  card: {
     padding: 15,
     backgroundColor: '#f9f9f9',
     borderWidth: 1,
@@ -247,7 +271,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-  matchText: {
+  cardText: {
     fontSize: 16,
   },
 });
