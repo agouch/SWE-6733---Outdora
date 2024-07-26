@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Platform } from 'react-native';
 import { auth, firestore, storage } from './firebaseConfig';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const ProfileScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [birthdate, setBirthdate] = useState(new Date());
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const user = auth.currentUser;
 
@@ -29,6 +32,7 @@ const ProfileScreen = ({ navigation }) => {
         const userData = userDoc.data();
         setFirstName(userData.firstname || '');
         setLastName(userData.lastname || '');
+        setBirthdate(userData.birthdate ? new Date(userData.birthdate) : new Date());
         setAge(userData.age ? userData.age.toString() : '');
         setGender(userData.gender || '');
         setImageUri(userData.imageUrl || null);
@@ -127,7 +131,8 @@ const ProfileScreen = ({ navigation }) => {
       const updateData = {
         firstname: firstName,
         lastname: lastName,
-        age: parseInt(age),
+        birthdate: birthdate.toISOString(),
+        age: calculateAge(birthdate),
         gender,
       };
 
@@ -180,6 +185,31 @@ const ProfileScreen = ({ navigation }) => {
     );
   };
 
+  const calculateAge = (birthdate) => {
+    const birthDate = new Date(birthdate);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+
+    return age;
+  };
+
+  const showDatepicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setBirthdate(selectedDate);
+      setAge(calculateAge(selectedDate));
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -211,14 +241,19 @@ const ProfileScreen = ({ navigation }) => {
         onChangeText={setLastName}
         placeholderTextColor="#888" // Change this to your desired color
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Age"
-        value={age}
-        onChangeText={setAge}
-        keyboardType="numeric"
-        placeholderTextColor="#888" // Change this to your desired color
-      />
+      <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
+        <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={birthdate}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+          maximumDate={new Date()}
+        />
+      )}
+      <Text style={styles.ageText}>Age: {age}</Text>
       <TextInput
         style={styles.input}
         placeholder="Gender"
@@ -267,6 +302,22 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  dateText: {
+    fontSize: 17,
+    color: '#888',
+  },
+  ageText: {
+    fontSize: 17,
+    marginBottom: 10,
   },
   button: {
     backgroundColor: '#007AFF',
