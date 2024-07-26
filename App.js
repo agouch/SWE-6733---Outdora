@@ -40,15 +40,12 @@ function HomeTabs() {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         headerShown: false,
-        tabBarActiveTintColor: '#f0a500',
-        tabBarInactiveTintColor: 'gray',
-        tabBarStyle: [
-          {
-            display: 'flex'
-          },
-          null
-        ]
+
       })}
+      tabBarOptions={{
+        activeTintColor: '#f0a500',
+        inactiveTintColor: 'gray',
+      }}
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: 'Home' }} />
       <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: 'Profile' }} />
@@ -60,6 +57,7 @@ function HomeTabs() {
 }
 
 export default function App() {
+  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
@@ -96,3 +94,6 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+
+

@@ -57,7 +57,7 @@ const MatchingScreen = ({ navigation }) => {
               const matchData = {
                 id: uuidv4(),
                 username: match.username,
-                firstname: match.firstname,
+                firstname: "match.firstname",
                 age: match.age,
                 gender: match.gender,
                 users: [user.uid, match.id],
@@ -70,7 +70,7 @@ const MatchingScreen = ({ navigation }) => {
             await updateDoc(currentUserRef, { matches: matchesWithUsersAndChats }, { merge: true });
             // Update matches for other users
             for (const match of matchesWithUsersAndChats) {
-              const reciprocalMatchData = {
+              await updateMatchForOtherUser(match.users[1], {
                 id: match.id,
                 username: currentUserData.username || user.email,
                 firstname: currentUserData.firstname,
@@ -78,7 +78,8 @@ const MatchingScreen = ({ navigation }) => {
                 gender: currentUserData.gender,
                 users: [match.users[1], user.uid],
                 chats: []
-              };
+              });
+              
               await updateMatchForOtherUser(match.users[1], reciprocalMatchData);
             }
 
@@ -217,24 +218,14 @@ const MatchingScreen = ({ navigation }) => {
     }
   };
 
-  const renderCard = (item) => {
-    if (!item) {
-      return (
-        <View style={styles.card}>
-          <Text style={styles.cardText}>No more matches available</Text>
-        </View>
-      );
-    }
-
-    return (
-      <View style={styles.card}>
-        <Text style={styles.cardText}>Username: {item.username || 'N/A'}</Text>
-        <Text style={styles.cardText}>First Name: {item.firstname || 'N/A'}</Text>
-        <Text style={styles.cardText}>Age: {item.age || 'N/A'}</Text>
-        <Text style={styles.cardText}>Gender: {item.gender || 'N/A'}</Text>
-      </View>
-    );
-  };
+  const renderCard = (item) => (
+    <View style={styles.card}>
+      <Text style={styles.cardText}>Username: {item.username || 'N/A'}</Text>
+      <Text style={styles.cardText}>First Name: {item.firstname || 'N/A'}</Text>
+      <Text style={styles.cardText}>Age: {item.age || 'N/A'}</Text>
+      <Text style={styles.cardText}>Gender: {item.gender || 'N/A'}</Text>
+    </View>
+  );
 
   if (loading) {
     return (
@@ -247,19 +238,15 @@ const MatchingScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Matches</Text>
-      {matches.length > 0 ? (
-        <Swiper
-          cards={matches}
-          renderCard={renderCard}
-          onSwipedRight={(cardIndex) => handleSwipeRight(cardIndex)}
-          onSwipedLeft={() => {}}
-          cardIndex={0}
-          backgroundColor={'#f9f9f9'}
-          stackSize={3}
-        />
-      ) : (
-        <Text style={styles.noMatchesText}>No matches found</Text>
-      )}
+      <Swiper
+        cards={matches}
+        renderCard={renderCard}
+        onSwipedRight={(cardIndex) => handleSwipeRight(cardIndex)}
+        onSwipedLeft={() => {}}
+        cardIndex={0}
+        backgroundColor={'#f9f9f9'}
+        stackSize={3}
+      />
     </View>
   );
 };
@@ -285,11 +272,6 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 16,
-  },
-  noMatchesText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginTop: 20,
   },
 });
 
