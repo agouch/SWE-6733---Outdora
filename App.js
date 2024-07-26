@@ -14,6 +14,7 @@ import 'react-native-get-random-values';
 const Stack = createStackNavigator();
 
 export default function App() {
+  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
