@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, InteractionManager, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Alert, InteractionManager, TouchableOpacity, Dimensions, Image } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { auth, firestore } from './firebaseConfig';
 import { collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -69,6 +69,7 @@ const MatchingScreen = () => {
         lastname: match.lastname || match.last_name || 'Unknown',
         age: match.age || 'Unknown',
         gender: match.gender || 'Unknown',
+        imageUrl: match.imageUrl || null, // Added imageUrl
         users: [user.uid, match.id],
         chats: []
       }));
@@ -196,6 +197,9 @@ const MatchingScreen = () => {
 
     return (
       <View style={styles.card}>
+        {item.imageUrl && (
+          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+        )}
         <View style={styles.cardContent}>
           <Text style={styles.nameText}>{item.firstname} {item.lastname}, {item.age}</Text>
           <Text style={styles.usernameText}>@{item.username}</Text>
@@ -325,6 +329,12 @@ const styles = StyleSheet.create({
     borderColor: '#E8E8E8',
     justifyContent: 'center',
     backgroundColor: 'white'
+  },
+  cardImage: {
+    width: '100%',
+    height: '60%',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   cardContent: {
     padding: 20,
