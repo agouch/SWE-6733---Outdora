@@ -11,6 +11,7 @@ const PreferencesScreen = ({ navigation }) => {
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedAge, setSelectedAge] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedSkill, setSelectedSkill] = useState('');
   const [loading, setLoading] = useState(true);
   const handleSelectGender = (gender) => {
     setSelectedGender(gender);
@@ -24,7 +25,9 @@ const PreferencesScreen = ({ navigation }) => {
   const handleSelectRegion = (region) => {
     setSelectedRegion(region);
   };
-
+  const handleSelectSkill = (skill) => {
+    setSelectedSkill(skill);
+  };
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -39,6 +42,7 @@ const PreferencesScreen = ({ navigation }) => {
           setSelectedActivity(userData.selectedActivity || '');
           setSelectedAge(userData.selectedAge || '');
           setSelectedRegion(userData.selectedRegion || '');
+          setSelectedSkill(userData.selectedSkill || '');
         }
       } catch (error) {
         console.error('Error fetching user preferences:', error);
@@ -59,7 +63,8 @@ const PreferencesScreen = ({ navigation }) => {
           selectedGender,
           selectedActivity,
           selectedAge,
-          selectedRegion
+          selectedRegion,
+          selectedSkill
         }, { merge: true });
 
         Alert.alert('Preferences Updated', 'Your preferences have been updated successfully.');
@@ -149,6 +154,29 @@ const PreferencesScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <Text style={styles.selectedText}>Selected Activity: {selectedActivity}</Text>
+{/* Skill */}
+      <Text style={styles.question}>What is your skill level?</Text>
+      <View style={styles.optionContainer}>
+        <TouchableOpacity
+          style={[styles.radioOption, selectedSkill === 'beginner' && styles.selectedOption]}
+          onPress={() => handleSelectSkill('beginner')}
+        >
+          <Text>beginner</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.radioOption, selectedSkill === 'intermediate' && styles.selectedOption]}
+          onPress={() => handleSelectSkill('intermediate')}
+        >
+          <Text>intermediate</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.radioOption, selectedSkill === 'advanced' && styles.selectedOption]}
+          onPress={() => handleSelectSkill('advanced')}
+        >
+          <Text>advanced</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.selectedText}>Selected Activity: {selectedActivity}</Text>
 {/* Region */}
       <Text style={styles.question}>Where do you live?</Text>
       <View style={styles.optionContainer}>
@@ -182,6 +210,7 @@ const PreferencesScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </View>
+    
   );
 };
 

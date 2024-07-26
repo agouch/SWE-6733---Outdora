@@ -38,26 +38,29 @@ const MatchingScreen = ({ navigation }) => {
               const otherActivity = otherUser.selectedActivity || '';
               const otherAge = otherUser.selectedAge || '';
               const otherRegion = otherUser.selectedRegion || '';
+              const otherSkill = otherUser.selectedSkill || '';
 
               const currentGender = currentUserData.gender?.toLowerCase() || '';
               const currentSelectedGender = currentUserData.selectedGender?.toLowerCase() || '';
               const currentActivity = currentUserData.selectedActivity || '';
               const currentAge = currentUserData.selectedAge || '';
               const currentRegion = currentUserData.selectedRegion || '';
+              const currentSkill = currentUserData.selectedSkill || '';
 
               return (
                 otherGender === currentSelectedGender &&
                 currentGender === otherSelectedGender &&
                 otherActivity === currentActivity &&
                 otherAge === currentAge &&
-                otherRegion === currentRegion
+                otherRegion === currentRegion &&
+                otherSkill === currentSkill
               );
             });
             const matchesWithUsersAndChats = filteredMatches.map(match => {
               const matchData = {
                 id: uuidv4(),
                 username: match.username,
-                firstname: "match.firstname",
+                firstname: match.firstname,
                 age: match.age,
                 gender: match.gender,
                 users: [user.uid, match.id],
