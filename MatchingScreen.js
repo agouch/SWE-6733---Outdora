@@ -19,9 +19,37 @@ const MatchingScreen = ({ navigation }) => {
         const currentUserDoc = await getDoc(currentUserRef);
         if (currentUserDoc.exists()) {
           const currentUserData = currentUserDoc.data();
+    
           if (currentUserData.matches && Array.isArray(currentUserData.matches) && currentUserData.matches.length > 0) {
+            const updatedMatches = [];
+    
+            for (const match of currentUserData.matches) {
+              if (match.users && match.users.length > 0) {
+                const matchUserId = match.users.find(id => id !== user.uid); // Get the ID of the match (not the current user)
+                const profileData = await fetchUserProfileById(matchUserId);
+    
+                if (profileData) {
+                  const matchData = {
+                    id: match.id,
+                    username: profileData.username || "Unknown",
+                    firstname: profileData.first_name || "N/A",
+                    age: profileData.age || "N/A",
+                    gender: profileData.gender || "N/A",
+                    users: match.users || [],
+                    chats: match.chats || []
+                  };
+    
+                  updatedMatches.push(matchData);
+                } else {
+                  console.warn(`No profile data found for user ID: ${matchUserId}`);
+                }
+              } else {
+                console.warn(`Match object missing user IDs:`, match);
+              }
+            }
+    
             InteractionManager.runAfterInteractions(() => {
-              setMatches(currentUserData.matches);
+              setMatches(updatedMatches);
               setLoading(false);
             });
           } else {
@@ -97,7 +125,26 @@ const MatchingScreen = ({ navigation }) => {
 
     fetchMatches();
   }, [user.uid]);
-
+  const fetchUserProfileById = async (userId) => {
+    try {
+      console.log('Fetching profile for user ID:', userId);
+  
+      const userRef = doc(firestore, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        console.log('Profile data found:', userDoc.data());
+        return userDoc.data();
+      } else {
+        console.warn(`No user found with ID: ${userId}`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+  };
+  
   const updateMatchForOtherUser = async (otherUserId, matchData) => {
     try {
       const otherUserRef = doc(firestore, 'users', otherUserId);
