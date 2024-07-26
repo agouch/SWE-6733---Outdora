@@ -1,106 +1,152 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
 import { auth, firestore, storage } from './firebaseConfig';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { launchImageLibrary } from 'react-native-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 
-export default function ProfileScreen({ navigation }) {
+const ProfileScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [username, setUsername] = useState('');
   const [age, setAge] = useState('');
-  const [birthday, setBirthday] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [gender, setGender] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [preferences, setPreferences] = useState('');
-  const [imageUri, setImageUri] = useState('');
+  const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const user = auth.currentUser;
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const userRef = doc(firestore, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
-
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setFirstName(userData.first_name || '');
-          setLastName(userData.last_name || '');
-          setUsername(userData.username || '');
-          setAge(userData.age || '');
-          setBirthday(new Date(userData.birthday || new Date()));
-          setGender(userData.gender || '');
-          setDisplayName(userData.displayName || '');
-          setPreferences(userData.preferences || '');
-          setImageUri(userData.imageUri || '');
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        setLoading(false);
-      }
-    };
-
     fetchUserProfile();
   }, []);
 
-  const handleSave = async () => {
+  const fetchUserProfile = async () => {
     try {
       const userRef = doc(firestore, 'users', user.uid);
-      await setDoc(userRef, {
-        first_name: firstName,
-        last_name: lastName,
-        username,
-        age,
-        birthday: birthday.toISOString().split('T')[0],  // Format date as YYYY-MM-DD
-        gender,
-        displayName,
-        preferences,
-        imageUri
-      }, { merge: true });
+      const userDoc = await getDoc(userRef);
 
-      Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
-      navigation.navigate('Home');
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setFirstName(userData.firstname || '');
+        setLastName(userData.lastname || '');
+        setAge(userData.age ? userData.age.toString() : '');
+        setGender(userData.gender || '');
+        setImageUri(userData.imageUrl || null);
+      }
+      setLoading(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
-      Alert.alert('Error', 'There was an error updating your profile. Please try again.');
+      console.error('Error fetching user profile:', error);
+      setLoading(false);
     }
   };
 
-  const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || birthday;
-    setShowDatePicker(false);
-    setBirthday(currentDate);
-  };
+  const handleImagePick = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission required", "You need to allow access to your photos to upload an image.");
+      return;
+    }
 
-  const renderDatePicker = () => {
-    return (
-      showDatePicker && (
-        <DateTimePicker
-          value={birthday}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-        />
-      )
-    );
-  };
-
-  const handleSelectImage = () => {
-    launchImageLibrary({ mediaType: 'photo' }, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.error('ImagePicker Error: ', response.error);
-      } else if (response.assets && response.assets.length > 0) {
-        const selectedImage = response.assets[0];
-        setImageUri(selectedImage.uri);
-      }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
     });
+
+    if (!result.canceled) {
+      const compressedImage = await compressImage(result.assets[0].uri);
+      setImageUri(compressedImage.uri);
+    }
+  };
+
+  const compressImage = async (uri) => {
+    const manipResult = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 800 } }], // Adjust the width as needed
+      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    return manipResult;
+  };
+
+  const uploadImage = async (uri) => {
+    if (!uri) {
+      console.log('No image URI provided');
+      return null;
+    }
+
+    try {
+      console.log('Starting image upload process...');
+      console.log('Image URI:', uri);
+
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      console.log('Blob created');
+
+      const filename = `profile_images/${user.uid}_${Date.now()}.jpg`;
+      console.log('Filename:', filename);
+
+      console.log('Storage object:', storage);
+      const storageRef = ref(storage, filename);
+      console.log('Storage reference created');
+
+      console.log('Uploading image to Firebase Storage...');
+      const snapshot = await uploadBytes(storageRef, blob);
+      console.log('Upload completed successfully');
+
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      console.log('File available at', downloadUrl);
+
+      return downloadUrl;
+    } catch (error) {
+      console.error('Error in uploadImage:', error);
+      console.error('Error stack:', error.stack);
+      throw error;
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const userRef = doc(firestore, 'users', user.uid);
+
+      let imageUrl = imageUri;
+      if (imageUri && !imageUri.startsWith('http')) {
+        console.log('Attempting to upload new image...');
+        try {
+          imageUrl = await uploadImage(imageUri);
+          console.log('Image upload result:', imageUrl);
+        } catch (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          Alert.alert('Error', `There was an error uploading the image: ${uploadError.message}`);
+          setLoading(false);
+          return;
+        }
+      }
+
+      const updateData = {
+        firstname: firstName,
+        lastname: lastName,
+        age: parseInt(age),
+        gender,
+      };
+
+      if (imageUrl) {
+        updateData.imageUrl = imageUrl;
+      }
+
+      console.log('Updating user document with:', updateData);
+      await updateDoc(userRef, updateData);
+
+      Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      console.error('Error stack:', error.stack);
+      Alert.alert('Error', `There was an error updating your profile: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -113,8 +159,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Update Profile</Text>
-      <TouchableOpacity onPress={handleSelectImage} style={styles.imageContainer}>
+      <TouchableOpacity onPress={handleImagePick} style={styles.imageContainer}>
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.image} />
         ) : (
@@ -124,147 +169,71 @@ export default function ProfileScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="First Name"
-        placeholderTextColor="#aaa"
         value={firstName}
         onChangeText={setFirstName}
       />
       <TextInput
         style={styles.input}
         placeholder="Last Name"
-        placeholderTextColor="#aaa"
         value={lastName}
         onChangeText={setLastName}
       />
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#aaa"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Age"
-        placeholderTextColor="#aaa"
         value={age}
         onChangeText={setAge}
         keyboardType="numeric"
       />
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-        <Text style={styles.inputText}>Birthday: {birthday.toISOString().split('T')[0]}</Text>
-      </TouchableOpacity>
-      {renderDatePicker()}
-      <View style={styles.genderContainer}>
-        <TouchableOpacity
-          style={[styles.genderButton, gender === 'male' && styles.selectedGender]}
-          onPress={() => setGender('male')}
-        >
-          <Text style={styles.genderButtonText}>Male</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.genderButton, gender === 'female' && styles.selectedGender]}
-          onPress={() => setGender('female')}
-        >
-          <Text style={styles.genderButtonText}>Female</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.genderButton, gender === 'other' && styles.selectedGender]}
-          onPress={() => setGender('other')}
-        >
-          <Text style={styles.genderButtonText}>Other</Text>
-        </TouchableOpacity>
-      </View>
       <TextInput
         style={styles.input}
-        placeholder="Display Name"
-        placeholderTextColor="#aaa"
-        value={displayName}
-        onChangeText={setDisplayName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Preferences"
-        placeholderTextColor="#aaa"
-        value={preferences}
-        onChangeText={setPreferences}
+        placeholder="Gender"
+        value={gender}
+        onChangeText={setGender}
       />
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
     backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    marginVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
-  },
-  inputText: {
-    color: '#000',
-  },
-  genderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 10,
-  },
-  genderButton: {
-    flex: 1,
-    padding: 10,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
-  },
-  selectedGender: {
-    backgroundColor: '#b28a68',
-  },
-  genderButtonText: {
-    color: '#000',
-  },
   imageContainer: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-    borderRadius: 50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#f0f0f0',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#eee',
+    alignSelf: 'center',
+    marginBottom: 20,
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 50,
   },
   imagePlaceholder: {
-    color: '#aaa',
+    color: '#888',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
   },
   button: {
-    width: '100%',
+    backgroundColor: '#007AFF',
     padding: 15,
-    backgroundColor: '#b28a68',
-    borderRadius: 8,
+    borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
   },
   buttonText: {
     color: '#fff',
@@ -272,3 +241,4 @@ const styles = StyleSheet.create({
   },
 });
 
+export default ProfileScreen;
