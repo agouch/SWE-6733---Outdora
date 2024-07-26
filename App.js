@@ -13,7 +13,7 @@ import MessagingScreen from './MessagingScreen';
 import ChatListScreen from './ChatListScreen';
 import MatchingScreen from './MatchingScreen';
 import PreferencesScreen from './PreferencesScreen';
-import { auth } from './firebaseConfig'; 
+import { auth } from './firebaseConfig';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,7 +40,7 @@ function HomeTabs() {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         headerShown: false,
-        tabBarActiveTintColor: '#f0a500',
+        tabBarActiveTintColor: '#b28a68',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: [
           {
@@ -87,10 +87,15 @@ export default function App() {
                   });
                 }}
                 title="Logout"
-                color="#f0a500"
+                color="#b28a68"
               />
             ),
           })}
+        />
+        <Stack.Screen 
+          name="Messages" 
+          component={MessagingScreen} 
+          options={({ route }) => ({ title: route.params?.recipientName || 'Chat' })}
         />
       </Stack.Navigator>
     </NavigationContainer>
