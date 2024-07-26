@@ -13,7 +13,7 @@ import MessagingScreen from './MessagingScreen';
 import ChatListScreen from './ChatListScreen';
 import MatchingScreen from './MatchingScreen';
 import PreferencesScreen from './PreferencesScreen';
-import { auth } from './firebaseConfig'; 
+import { auth } from './firebaseConfig';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -85,10 +85,15 @@ export default function App() {
                   });
                 }}
                 title="Logout"
-                color="#f0a500"
+                color="#b28a68"
               />
             ),
           })}
+        />
+        <Stack.Screen 
+          name="Messages" 
+          component={MessagingScreen} 
+          options={({ route }) => ({ title: route.params?.recipientName || 'Chat' })}
         />
       </Stack.Navigator>
     </NavigationContainer>
