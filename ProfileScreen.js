@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
 import { auth, firestore, storage } from './firebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -149,6 +149,37 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const handleDeleteProfile = async () => {
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to delete your profile? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Profile deletion cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              const userRef = doc(firestore, 'users', user.uid);
+              await deleteDoc(userRef);
+              await user.delete();
+              Alert.alert('Profile Deleted', 'Your profile has been deleted successfully.');
+              navigation.navigate('Login');
+            } catch (error) {
+              console.error('Error deleting profile:', error);
+              Alert.alert('Error', `There was an error deleting your profile: ${error.message}`);
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -171,12 +202,14 @@ const ProfileScreen = ({ navigation }) => {
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
+        placeholderTextColor="#888" // Change this to your desired color
       />
       <TextInput
         style={styles.input}
         placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
+        placeholderTextColor="#888" // Change this to your desired color
       />
       <TextInput
         style={styles.input}
@@ -184,15 +217,20 @@ const ProfileScreen = ({ navigation }) => {
         value={age}
         onChangeText={setAge}
         keyboardType="numeric"
+        placeholderTextColor="#888" // Change this to your desired color
       />
       <TextInput
         style={styles.input}
         placeholder="Gender"
         value={gender}
         onChangeText={setGender}
+        placeholderTextColor="#888" // Change this to your desired color
       />
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProfile}>
+        <Text style={styles.buttonText}>Delete Profile</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -203,6 +241,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#fff',
+    justifyContent: 'center',
   },
   imageContainer: {
     width: 150,
@@ -234,10 +273,18 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
   },
 });
 
