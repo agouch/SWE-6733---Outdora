@@ -22,6 +22,21 @@ const MatchingScreen = () => {
     fetchPotentialMatches();
   }, []);
 
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    console.log(`Calculating distance between (${lat1}, ${lon1}) and (${lat2}, ${lon2})`);
+    const R = 3959; // Radius of the Earth in mi
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in mi
+    console.log(`Calculated distance: ${distance.toFixed(2)} mi`);
+    return distance;
+  };
+
   const fetchPotentialMatches = async () => {
     try {
       console.log('Fetching potential matches...');
@@ -29,6 +44,7 @@ const MatchingScreen = () => {
       const currentUserDoc = await getDoc(currentUserRef);
       const currentUserData = currentUserDoc.data();
       console.log('Current user data:', currentUserData);
+      console.log('Current user location:', currentUserData.location);
 
       const usersCollection = collection(firestore, 'users');
       const usersSnapshot = await getDocs(usersCollection);
@@ -40,6 +56,7 @@ const MatchingScreen = () => {
 
       const filteredMatches = allUsers.filter(otherUser => {
         console.log('Checking user:', otherUser.id);
+        console.log('Other user data:', otherUser);
 
         if (otherUser.id === user.uid) {
           console.log('Skipping current user');
@@ -56,6 +73,31 @@ const MatchingScreen = () => {
           return false;
         }
 
+        // Calculate distance if both users have location
+        if (currentUserData.location && otherUser.location) {
+          console.log('Current user location:', currentUserData.location);
+          console.log('Other user location:', otherUser.location);
+          
+          const distance = calculateDistance(
+            currentUserData.location.latitude,
+            currentUserData.location.longitude,
+            otherUser.location.latitude,
+            otherUser.location.longitude
+          );
+          otherUser.distance = distance;
+          console.log(`Distance to ${otherUser.firstname}: ${distance.toFixed(2)} mi`);
+
+          // You can set a maximum distance here, e.g., 100 mi
+          if (distance > 100) {
+            console.log('User too far away');
+            return false;
+          }
+        } else {
+          console.log('Location not available for distance calculation');
+          console.log('Current user location:', currentUserData.location);
+          console.log('Other user location:', otherUser.location);
+        }
+
         console.log('User passed all filters');
         return true;
       });
@@ -69,7 +111,8 @@ const MatchingScreen = () => {
         lastname: match.lastname || match.last_name || 'Unknown',
         age: match.age || 'Unknown',
         gender: match.gender || 'Unknown',
-        imageUrl: match.imageUrl || null, // Added imageUrl
+        imageUrl: match.imageUrl || null,
+        distance: match.distance !== undefined ? match.distance.toFixed(2) : 'Unknown',
         users: [user.uid, match.id],
         chats: []
       }));
@@ -204,6 +247,7 @@ const MatchingScreen = () => {
           <Text style={styles.nameText}>{item.firstname} {item.lastname}, {item.age}</Text>
           <Text style={styles.usernameText}>@{item.username}</Text>
           <Text style={styles.genderText}>{item.gender}</Text>
+          <Text style={styles.distanceText}>Distance: {item.distance} miles</Text>
         </View>
       </View>
     );
@@ -312,7 +356,6 @@ const MatchingScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

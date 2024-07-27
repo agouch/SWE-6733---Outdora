@@ -1,19 +1,16 @@
 import React from 'react';
-import { Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import LoginScreen from './LoginScreen';
-import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
 import RegisterScreen from './RegisterScreen';
 import MessagingScreen from './MessagingScreen';
 import ChatListScreen from './ChatListScreen';
 import MatchingScreen from './MatchingScreen';
 import PreferencesScreen from './PreferencesScreen';
-import { auth } from './firebaseConfig';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -25,14 +22,12 @@ function HomeTabs() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          if (route.name === 'HomeTab') {
+          if (route.name === 'MatchingTab') {
             iconName = 'home-outline';
           } else if (route.name === 'ProfileTab') {
             iconName = 'person-outline';
           } else if (route.name === 'MatchesTab') {
             iconName = 'chatbubbles-outline';
-          } else if (route.name === 'MatchingTab') {
-            iconName = 'people-outline';
           } else if (route.name === 'PreferencesTab') {
             iconName = 'settings-outline';
           }
@@ -46,10 +41,9 @@ function HomeTabs() {
         inactiveTintColor: 'gray',
       }}
     >
-      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="MatchingTab" component={MatchingScreen} options={{ title: 'Home' }} />
       <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: 'Profile' }} />
       <Tab.Screen name="MatchesTab" component={ChatListScreen} options={{ title: 'Matches' }} />
-      <Tab.Screen name="MatchingTab" component={MatchingScreen} options={{ title: 'Matching' }} />
       <Tab.Screen name="PreferencesTab" component={PreferencesScreen} options={{ title: 'Preferences' }} />
     </Tab.Navigator>
   );
@@ -58,40 +52,28 @@ function HomeTabs() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen 
-          name="Register" 
-          component={RegisterScreen} 
-          options={{ headerShown: false }} 
-        />
+      <Stack.Navigator 
+        initialRouteName="Login"
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: false, // This disables the swipe gesture for all screens
+        }}
+      >
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen 
           name="Home" 
           component={HomeTabs} 
-          options={({ navigation }) => ({
-            headerRight: () => (
-              <Button
-                onPress={() => {
-                  auth.signOut().then(() => {
-                    navigation.replace('Login');
-                  }).catch(error => {
-                    console.error('Error signing out:', error);
-                  });
-                }}
-                title="Logout"
-                color="#b28a68"
-              />
-            ),
-          })}
+          options={{
+            gestureEnabled: false,
+          }}
         />
         <Stack.Screen 
           name="Messages" 
-          component={MessagingScreen} 
-          options={({ route }) => ({ title: route.params?.recipientName || 'Chat' })}
+          component={MessagingScreen}
+          options={{
+            gestureEnabled: false,
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

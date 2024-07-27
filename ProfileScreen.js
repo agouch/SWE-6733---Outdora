@@ -7,8 +7,9 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
+import { useNavigation } from '@react-navigation/native';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthdate, setBirthdate] = useState(new Date());
@@ -19,6 +20,7 @@ const ProfileScreen = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [location, setLocation] = useState(null);
 
+  const navigation = useNavigation();
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -40,49 +42,11 @@ const ProfileScreen = ({ navigation }) => {
         setImageUri(userData.imageUrl || null);
         setLocation(userData.location || null);
       }
-      if (!userDoc.data().location) {
-        getAndSetLocation();
-      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setLoading(false);
     }
-  };
-
-  const getAndSetLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission denied', 'Permission to access location was denied');
-      return;
-    }
-
-    let currentLocation = await Location.getCurrentPositionAsync({});
-    const { latitude, longitude } = currentLocation.coords;
-    
-    // Round to 2 decimal places for less precision (approx. 1.1km accuracy)
-    const approximateLatitude = Math.round(latitude * 100) / 100;
-    const approximateLongitude = Math.round(longitude * 100) / 100;
-
-    const newLocation = { latitude: approximateLatitude, longitude: approximateLongitude };
-    setLocation(newLocation);
-  };
-
-  const handleUpdateLocation = () => {
-    Alert.alert(
-      "Update Location",
-      "Do you want to update your location?",
-      [
-        {
-          text: "No",
-          style: "cancel"
-        },
-        { 
-          text: "Yes", 
-          onPress: () => getAndSetLocation()
-        }
-      ]
-    );
   };
 
   const handleImagePick = async () => {
@@ -108,7 +72,7 @@ const ProfileScreen = ({ navigation }) => {
   const compressImage = async (uri) => {
     const manipResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: 800 } }], // Adjust the width as needed
+      [{ resize: { width: 800 } }],
       { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
     );
     return manipResult;
@@ -121,31 +85,15 @@ const ProfileScreen = ({ navigation }) => {
     }
 
     try {
-      console.log('Starting image upload process...');
-      console.log('Image URI:', uri);
-
       const response = await fetch(uri);
       const blob = await response.blob();
-      console.log('Blob created');
-
       const filename = `profile_images/${user.uid}_${Date.now()}.jpg`;
-      console.log('Filename:', filename);
-
-      console.log('Storage object:', storage);
       const storageRef = ref(storage, filename);
-      console.log('Storage reference created');
-
-      console.log('Uploading image to Firebase Storage...');
       const snapshot = await uploadBytes(storageRef, blob);
-      console.log('Upload completed successfully');
-
       const downloadUrl = await getDownloadURL(snapshot.ref);
-      console.log('File available at', downloadUrl);
-
       return downloadUrl;
     } catch (error) {
       console.error('Error in uploadImage:', error);
-      console.error('Error stack:', error.stack);
       throw error;
     }
   };
@@ -157,16 +105,7 @@ const ProfileScreen = ({ navigation }) => {
 
       let imageUrl = imageUri;
       if (imageUri && !imageUri.startsWith('http')) {
-        console.log('Attempting to upload new image...');
-        try {
-          imageUrl = await uploadImage(imageUri);
-          console.log('Image upload result:', imageUrl);
-        } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          Alert.alert('Error', `There was an error uploading the image: ${uploadError.message}`);
-          setLoading(false);
-          return;
-        }
+        imageUrl = await uploadImage(imageUri);
       }
 
       const updateData = {
@@ -182,14 +121,12 @@ const ProfileScreen = ({ navigation }) => {
         updateData.imageUrl = imageUrl;
       }
 
-      console.log('Updating user document with:', updateData);
       await updateDoc(userRef, updateData);
 
       Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
       navigation.goBack();
     } catch (error) {
       console.error('Error updating profile:', error);
-      console.error('Error stack:', error.stack);
       Alert.alert('Error', `There was an error updating your profile: ${error.message}`);
     } finally {
       setLoading(false);
@@ -252,6 +189,33 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const handleUpdateLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Permission to access location was denied');
+      return;
+    }
+
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = currentLocation.coords;
+    
+    const approximateLatitude = Math.round(latitude * 100) / 100;
+    const approximateLongitude = Math.round(longitude * 100) / 100;
+
+    const newLocation = { latitude: approximateLatitude, longitude: approximateLongitude };
+    setLocation(newLocation);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      navigation.replace('Login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      Alert.alert('Error', 'Failed to log out. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -283,21 +247,18 @@ const ProfileScreen = ({ navigation }) => {
         onChangeText={setLastName}
         placeholderTextColor="#888"
       />
-      <View style={styles.datePickerContainer}>
-        <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
-          <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={birthdate}
-            mode="date"
-            display="default"
-            onChange={onDateChange}
-            maximumDate={new Date()}
-            style={styles.dateTimePicker}
-          />
-        )}
-      </View>
+      <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
+        <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={birthdate}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+          maximumDate={new Date()}
+        />
+      )}
       <Text style={styles.ageText}>Age: {age}</Text>
       <TextInput
         style={styles.input}
@@ -317,6 +278,9 @@ const ProfileScreen = ({ navigation }) => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProfile}>
         <Text style={styles.buttonText}>Delete Profile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -354,27 +318,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
   },
-  datePickerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
   dateInput: {
-    flex: 1,
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 10,
+    marginBottom: 10,
     borderRadius: 5,
     justifyContent: 'center',
   },
   dateText: {
     fontSize: 17,
     color: '#888',
-  },
-  dateTimePicker: {
-    flex: 1,
-    marginLeft: 10,
   },
   ageText: {
     fontSize: 17,
@@ -397,6 +351,13 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#FF9500',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
