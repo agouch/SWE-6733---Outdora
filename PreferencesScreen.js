@@ -289,6 +289,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 70,
     padding: 20,
   },
   title: {
