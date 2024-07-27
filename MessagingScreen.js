@@ -188,7 +188,7 @@ const MessagingScreen = ({ route, navigation }) => {
                   <Text style={styles.profileImageText}>{recipient.first_name ? recipient.first_name[0] : 'U'}</Text>
                 </View>
               )}
-              <Text style={styles.headerText}>{recipient.first_name || 'Chat'}</Text>
+              <Text style={styles.headerText}>{recipient.firstname || 'Chat'}</Text>
               <TouchableOpacity style={styles.unmatchButton} onPress={handleUnmatch}>
                 <Text style={styles.unmatchButtonText}>Unmatch</Text>
               </TouchableOpacity>
