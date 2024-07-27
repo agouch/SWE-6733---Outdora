@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, SafeAreaView, StatusBar } from 'react-native';
-import { doc, getDoc, addDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, SafeAreaView, StatusBar, Alert } from 'react-native';
+import { doc, getDoc, addDoc, updateDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { auth, firestore } from './firebaseConfig';
 import { Ionicons } from '@expo/vector-icons'; // Make sure to install this package if you haven't already
 
@@ -70,6 +70,51 @@ const MessagingScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleUnmatch = async () => {
+    Alert.alert(
+      'Confirm Unmatch',
+      'Are you sure you want to unmatch this person?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Unmatch cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Unmatch',
+          onPress: async () => {
+            try {
+              const userRef = doc(firestore, 'users', user.uid);
+              const recipientRef = doc(firestore, 'users', recipientId);
+
+              const userDoc = await getDoc(userRef);
+              const recipientDoc = await getDoc(recipientRef);
+
+              if (userDoc.exists() && recipientDoc.exists()) {
+                const userData = userDoc.data();
+                const recipientData = recipientDoc.data();
+
+                const updatedUserMatches = userData.matches.filter(match => match.id !== matchId);
+                const updatedRecipientMatches = recipientData.matches.filter(match => match.id !== matchId);
+
+                await updateDoc(userRef, { matches: updatedUserMatches });
+                await updateDoc(recipientRef, { matches: updatedRecipientMatches });
+
+                Alert.alert('Unmatched', 'You have successfully unmatched this person.');
+                navigation.goBack();
+              }
+            } catch (error) {
+              console.error('Error unmatching:', error);
+              Alert.alert('Error', `There was an error unmatching: ${error.message}`);
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -91,6 +136,9 @@ const MessagingScreen = ({ route, navigation }) => {
                 </View>
               )}
               <Text style={styles.headerText}>{recipient.first_name || 'Chat'}</Text>
+              <TouchableOpacity style={styles.unmatchButton} onPress={handleUnmatch}>
+                <Text style={styles.unmatchButtonText}>Unmatch</Text>
+              </TouchableOpacity>
             </View>
             <FlatList
               data={messages}
@@ -166,6 +214,16 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
+    fontWeight: 'bold',
+  },
+  unmatchButton: {
+    backgroundColor: '#FF3B30',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 'auto',
+  },
+  unmatchButtonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
   messageList: {
