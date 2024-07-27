@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Platform, Modal } from 'react-native';
 import { auth, firestore, storage } from './firebaseConfig';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthdate, setBirthdate] = useState(new Date());
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [instagramUsername, setInstagramUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [instagram, setInstagram] = useState('');
+  const [location, setLocation] = useState(null);
+  const [showGenderModal, setShowGenderModal] = useState(false);
+
+  const navigation = useNavigation();
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -36,7 +43,8 @@ const ProfileScreen = ({ navigation }) => {
         setAge(userData.age ? userData.age.toString() : '');
         setGender(userData.gender || '');
         setImageUri(userData.imageUrl || null);
-        setInstagram(userData.instagram || '');
+        setLocation(userData.location || null);
+        setInstagramUsername(userData.instagramUsername || '');
       }
       setLoading(false);
     } catch (error) {
@@ -68,7 +76,7 @@ const ProfileScreen = ({ navigation }) => {
   const compressImage = async (uri) => {
     const manipResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: 800 } }], // Adjust the width as needed
+      [{ resize: { width: 800 } }],
       { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
     );
     return manipResult;
@@ -81,31 +89,15 @@ const ProfileScreen = ({ navigation }) => {
     }
 
     try {
-      console.log('Starting image upload process...');
-      console.log('Image URI:', uri);
-
       const response = await fetch(uri);
       const blob = await response.blob();
-      console.log('Blob created');
-
       const filename = `profile_images/${user.uid}_${Date.now()}.jpg`;
-      console.log('Filename:', filename);
-
-      console.log('Storage object:', storage);
       const storageRef = ref(storage, filename);
-      console.log('Storage reference created');
-
-      console.log('Uploading image to Firebase Storage...');
       const snapshot = await uploadBytes(storageRef, blob);
-      console.log('Upload completed successfully');
-
       const downloadUrl = await getDownloadURL(snapshot.ref);
-      console.log('File available at', downloadUrl);
-
       return downloadUrl;
     } catch (error) {
       console.error('Error in uploadImage:', error);
-      console.error('Error stack:', error.stack);
       throw error;
     }
   };
@@ -117,16 +109,7 @@ const ProfileScreen = ({ navigation }) => {
 
       let imageUrl = imageUri;
       if (imageUri && !imageUri.startsWith('http')) {
-        console.log('Attempting to upload new image...');
-        try {
-          imageUrl = await uploadImage(imageUri);
-          console.log('Image upload result:', imageUrl);
-        } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          Alert.alert('Error', `There was an error uploading the image: ${uploadError.message}`);
-          setLoading(false);
-          return;
-        }
+        imageUrl = await uploadImage(imageUri);
       }
 
       const updateData = {
@@ -135,21 +118,20 @@ const ProfileScreen = ({ navigation }) => {
         birthdate: birthdate.toISOString(),
         age: calculateAge(birthdate),
         gender,
-        instagram,
+        location,
+        instagramUsername,
       };
 
       if (imageUrl) {
         updateData.imageUrl = imageUrl;
       }
 
-      console.log('Updating user document with:', updateData);
       await updateDoc(userRef, updateData);
 
       Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
       navigation.goBack();
     } catch (error) {
       console.error('Error updating profile:', error);
-      console.error('Error stack:', error.stack);
       Alert.alert('Error', `There was an error updating your profile: ${error.message}`);
     } finally {
       setLoading(false);
@@ -188,29 +170,92 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const calculateAge = (birthdate) => {
-    const birthDate = new Date(birthdate);
     const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      return age - 1;
+    let age = today.getFullYear() - birthdate.getFullYear();
+    const m = today.getMonth() - birthdate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+      age--;
     }
-
     return age;
   };
 
-  const showDatepicker = () => {
-    setShowDatePicker(true);
+  const handleUpdateLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Permission to access location was denied');
+      return;
+    }
+    Alert.alert('Location Updated', 'Your location has been successfully updated.');
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = currentLocation.coords;
+    
+    const approximateLatitude = Math.round(latitude * 100) / 100;
+    const approximateLongitude = Math.round(longitude * 100) / 100;
+
+    const newLocation = { latitude: approximateLatitude, longitude: approximateLongitude };
+    setLocation(newLocation);
   };
 
-  const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setBirthdate(selectedDate);
-      setAge(calculateAge(selectedDate));
-    }
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Unmatch cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            try {
+              await auth.signOut();
+              navigation.replace('Login');
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to log out. Please try again.');
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    );
   };
+
+  const genderOptions = ['Male', 'Female', 'Other'];
+
+  const renderGenderModal = () => (
+    <Modal
+      visible={showGenderModal}
+      transparent={true}
+      animationType="slide"
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          {genderOptions.map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={styles.modalOption}
+              onPress={() => {
+                setGender(option);
+                setShowGenderModal(false);
+              }}
+            >
+              <Text style={styles.modalOptionText}>{option}</Text>
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity
+            style={[styles.modalOption, styles.cancelOption]}
+            onPress={() => setShowGenderModal(false)}
+          >
+            <Text style={styles.cancelOptionText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   if (loading) {
     return (
@@ -234,7 +279,7 @@ const ProfileScreen = ({ navigation }) => {
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
-        placeholderTextColor="#888" 
+        placeholderTextColor="#888"
       />
       <TextInput
         style={styles.input}
@@ -243,39 +288,61 @@ const ProfileScreen = ({ navigation }) => {
         onChangeText={setLastName}
         placeholderTextColor="#888"
       />
-      <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
-        <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={birthdate}
-          mode="date"
-          display="default"
-          onChange={onDateChange}
-          maximumDate={new Date()}
-        />
-      )}
+      <View style={styles.datePickerContainer}>
+        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInput}>
+          <Text style={birthdate ? styles.inputText : styles.placeholderText}>
+            {birthdate ? birthdate.toDateString() : 'Select Birthdate'}
+          </Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={birthdate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(Platform.OS === 'ios');
+              if (selectedDate) {
+                setBirthdate(selectedDate);
+                setAge(calculateAge(selectedDate).toString());
+              }
+            }}
+            style={styles.dateTimePicker}
+            maximumDate={new Date()}
+          />
+        )}
+      </View>
       <Text style={styles.ageText}>Age: {age}</Text>
+      <TouchableOpacity
+        style={styles.input}
+        onPress={() => setShowGenderModal(true)}
+      >
+        <Text style={gender ? styles.inputText : styles.placeholderText}>
+          {gender || 'Select Gender'}
+        </Text>
+      </TouchableOpacity>
       <TextInput
         style={styles.input}
-        placeholder="Gender"
-        value={gender}
-        onChangeText={setGender}
-        placeholderTextColor="#888" 
+        placeholder="Instagram Username"
+        value={instagramUsername}
+        onChangeText={setInstagramUsername}
+        placeholderTextColor="#888"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Instagram"
-        value={instagram}
-        onChangeText={setInstagram}
-        placeholderTextColor="#888" 
-      />
+      {location && (
+        <Text style={styles.locationText}>Location: {location.latitude}, {location.longitude}</Text>
+      )}
+      <TouchableOpacity style={styles.button} onPress={handleUpdateLocation}>
+        <Text style={styles.buttonText}>Update Location</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProfile}>
         <Text style={styles.buttonText}>Delete Profile</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.buttonText}>Logout</Text>
+      </TouchableOpacity>
+      {renderGenderModal()}
     </ScrollView>
   );
 };
@@ -284,8 +351,8 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
+    paddingTop: 100,
     backgroundColor: '#fff',
-    justifyContent: 'center',
   },
   imageContainer: {
     width: 150,
@@ -305,31 +372,64 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     color: '#888',
   },
+  datePickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  dateInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  dateTimePicker: {
+    flex: 1,
+    marginLeft: 10,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    fontSize: 16,
   },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    justifyContent: 'center',
+  inputText: {
+    fontSize: 16,
+    color: '#333',
   },
-  dateText: {
-    fontSize: 17,
+  placeholderText: {
+    fontSize: 16,
     color: '#888',
   },
   ageText: {
-    fontSize: 17,
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  locationText: {
+    fontSize: 16,
     marginBottom: 10,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#c3924f',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  deleteButton: {
+    backgroundColor: '#6b93d6',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#4f4cb0',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -339,12 +439,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  deleteButton: {
-    backgroundColor: '#FF3B30',
-    padding: 15,
-    borderRadius: 5,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+  },
+  modalOption: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalOptionText: {
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  cancelOption: {
+    borderBottomWidth: 0,
+    marginTop: 10,
+  },
+  cancelOptionText: {
+    color: 'red',
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
 
