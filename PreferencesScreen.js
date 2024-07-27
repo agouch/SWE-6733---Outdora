@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { auth, firestore } from './firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import * as Location from 'expo-location';
+import Slider from '@react-native-community/slider';
 
 const PreferencesScreen = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedAge, setSelectedAge] = useState('');
-  const [selectedRegion, setSelectedRegion] = useState('');
+  const [climbingSkill, setClimbingSkill] = useState(0);
+  const [hikingSkill, setHikingSkill] = useState(0);
+  const [bikingSkill, setBikingSkill] = useState(0);
+  const [runningSkill, setRunningSkill] = useState(0);
   const [approximateLocation, setApproximateLocation] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,10 +28,6 @@ const PreferencesScreen = ({ navigation }) => {
     setSelectedAge(ageGroup);
   };
 
-  const handleSelectRegion = (region) => {
-    setSelectedRegion(region);
-  };
-
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -35,13 +35,16 @@ const PreferencesScreen = ({ navigation }) => {
       try {
         const userRef = doc(firestore, 'users', user.uid);
         const userDoc = await getDoc(userRef);
-        
+
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setSelectedGender(userData.selectedGender || '');
           setSelectedActivity(userData.selectedActivity || '');
           setSelectedAge(userData.selectedAge || '');
-          setSelectedRegion(userData.selectedRegion || '');
+          setClimbingSkill(userData.climbingSkill || 0);
+          setHikingSkill(userData.hikingSkill || 0);
+          setBikingSkill(userData.bikingSkill || 0);
+          setRunningSkill(userData.runningSkill || 0);
           setApproximateLocation(userData.approximateLocation || null);
         }
       } catch (error) {
@@ -69,7 +72,7 @@ const PreferencesScreen = ({ navigation }) => {
     try {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      
+
       // Round to 2 decimal places for less precision (approx. 1.1km accuracy)
       const approximateLatitude = Math.round(latitude * 100) / 100;
       const approximateLongitude = Math.round(longitude * 100) / 100;
@@ -88,7 +91,10 @@ const PreferencesScreen = ({ navigation }) => {
           selectedGender,
           selectedActivity,
           selectedAge,
-          selectedRegion,
+          climbingSkill,
+          hikingSkill,
+          bikingSkill,
+          runningSkill,
           approximateLocation
         }, { merge: true });
 
@@ -101,6 +107,27 @@ const PreferencesScreen = ({ navigation }) => {
     }
   };
 
+  const renderSlider = (label, value, setValue, min, max, step, markers) => (
+    <View style={styles.sliderContainer}>
+      <Text style={styles.sliderLabel}>{label}: {value}</Text>
+      <Slider
+        style={styles.slider}
+        minimumValue={min}
+        maximumValue={max}
+        step={step}
+        value={value}
+        onValueChange={setValue}
+        minimumTrackTintColor="#b28a68"
+        maximumTrackTintColor="#000000"
+      />
+      <View style={styles.markerContainer}>
+        {markers.map(marker => (
+          <Text key={marker} style={styles.marker}>{marker}</Text>
+        ))}
+      </View>
+    </View>
+  );
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -112,8 +139,55 @@ const PreferencesScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Update Preferences</Text>
-      {/* Existing preference options... */}
-      
+
+      {/* Gender Preference */}
+      <Text style={styles.question}>Preferred Gender:</Text>
+      <View style={styles.optionContainer}>
+        {['Male', 'Female', 'Other'].map(gender => (
+          <TouchableOpacity
+            key={gender}
+            style={[styles.radioOption, selectedGender === gender && styles.selectedOption]}
+            onPress={() => handleSelectGender(gender)}
+          >
+            <Text style={{ color: selectedGender === gender ? '#fff' : '#000' }}>{gender}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Activity Preference */}
+      <Text style={styles.question}>Preferred Activity:</Text>
+      <View style={styles.optionContainer}>
+        {['Hiking', 'Biking', 'Climbing', 'Running'].map(activity => (
+          <TouchableOpacity
+            key={activity}
+            style={[styles.radioOption, selectedActivity === activity && styles.selectedOption]}
+            onPress={() => handleSelectActivity(activity)}
+          >
+            <Text style={{ color: selectedActivity === activity ? '#fff' : '#000' }}>{activity}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Age Preference */}
+      <Text style={styles.question}>Preferred Age Group:</Text>
+      <View style={styles.optionContainer}>
+        {['18-25', '26-35', '36-45', '46+'].map(age => (
+          <TouchableOpacity
+            key={age}
+            style={[styles.radioOption, selectedAge === age && styles.selectedOption]}
+            onPress={() => handleSelectAgeGroup(age)}
+          >
+            <Text style={{ color: selectedAge === age ? '#fff' : '#000' }}>{age}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Skill Level Sliders */}
+      {renderSlider('Climbing Skill (V-scale)', climbingSkill, setClimbingSkill, 0, 10, 1, ['V0', 'V2', 'V4', 'V6', 'V8', 'V10'])}
+      {renderSlider('Hiking Skill (Beginner-Expert)', hikingSkill, setHikingSkill, 0, 10, 1, ['Beginner', 'Intermediate', 'Expert'])}
+      {renderSlider('Biking Skill (Beginner-Expert)', bikingSkill, setBikingSkill, 0, 10, 1, ['Beginner', 'Intermediate', 'Expert'])}
+      {renderSlider('Running Skill (Beginner-Expert)', runningSkill, setRunningSkill, 0, 10, 1, ['Beginner', 'Intermediate', 'Expert'])}
+
       {/* Approximate Location */}
       <Text style={styles.question}>Approximate Location:</Text>
       {approximateLocation ? (
@@ -134,13 +208,13 @@ const PreferencesScreen = ({ navigation }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 100,
+    padding: 20,
   },
   title: {
     fontSize: 24,
@@ -148,28 +222,50 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   question: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   optionContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   radioOption: {
     flex: 1,
-    maxWidth: 100,
+    maxWidth: 120,
     alignItems: 'center',
     flexDirection: 'column',
     borderWidth: 1,
     borderColor: 'black',
     borderStyle: 'solid',
-    marginRight: 2,
-    marginLeft: 2,
-    padding: 3,
+    margin: 5,
+    padding: 10,
+    borderRadius: 5,
   },
   selectedOption: {
     backgroundColor: '#b28a68',
+  },
+  sliderContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  sliderLabel: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  slider: {
+    width: '100%',
+  },
+  markerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  marker: {
+    fontSize: 12,
   },
   button: {
     width: '80%',
@@ -183,7 +279,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  
 });
 
 export default PreferencesScreen;
