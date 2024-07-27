@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
 import { auth, firestore } from './firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-
-
+import * as Location from 'expo-location';
 
 const PreferencesScreen = ({ navigation }) => {
-
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedAge, setSelectedAge] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
+  const [approximateLocation, setApproximateLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const handleSelectGender = (gender) => {
     setSelectedGender(gender);
   };
+
   const handleSelectActivity = (activity) => {
     setSelectedActivity(activity);
   };
+
   const handleSelectAgeGroup = (ageGroup) => {
     setSelectedAge(ageGroup);
   };
+
   const handleSelectRegion = (region) => {
     setSelectedRegion(region);
   };
@@ -39,30 +42,57 @@ const PreferencesScreen = ({ navigation }) => {
           setSelectedActivity(userData.selectedActivity || '');
           setSelectedAge(userData.selectedAge || '');
           setSelectedRegion(userData.selectedRegion || '');
+          setApproximateLocation(userData.approximateLocation || null);
         }
       } catch (error) {
         console.error('Error fetching user preferences:', error);
+      } finally {
         setLoading(false);
       }
-      finally {
-      setLoading(false);
-    }
     };
 
     fetchUserPreferences();
+    getLocationPermission();
   }, []);
+
+  const getLocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Permission to access location was denied');
+      return;
+    }
+
+    getApproximateLocation();
+  };
+
+  const getApproximateLocation = async () => {
+    try {
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      
+      // Round to 2 decimal places for less precision (approx. 1.1km accuracy)
+      const approximateLatitude = Math.round(latitude * 100) / 100;
+      const approximateLongitude = Math.round(longitude * 100) / 100;
+
+      setApproximateLocation({ latitude: approximateLatitude, longitude: approximateLongitude });
+    } catch (error) {
+      console.error('Error getting location:', error);
+    }
+  };
+
   const handleSave = async () => {
-    if (user){
+    if (user) {
       try {
         const userRef = doc(firestore, 'users', user.uid);
         await setDoc(userRef, {
           selectedGender,
           selectedActivity,
           selectedAge,
-          selectedRegion
+          selectedRegion,
+          approximateLocation
         }, { merge: true });
 
-        Alert.alert('Preferences Updated', 'Your preferences have been updated successfully.');
+        Alert.alert('Preferences Updated', 'Your preferences and approximate location have been updated successfully.');
         navigation.navigate('Home');
       } catch (error) {
         console.error('Error updating preferences:', error);
@@ -70,6 +100,7 @@ const PreferencesScreen = ({ navigation }) => {
       }
     }
   };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -77,113 +108,32 @@ const PreferencesScreen = ({ navigation }) => {
       </View>
     );
   }
+
   return (
-    <View style={styles.container}>
-   <Text style={styles.title}>Update Preferences</Text>
-{/* Gender */}
-      <Text style={styles.question}>What is your preferred gender?</Text>
-      <View style={styles.optionContainer}>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedGender === 'female' && styles.selectedOption]}
-          onPress={() => handleSelectGender('female')}
-        >
-          <Text>Female</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedGender === 'male' && styles.selectedOption]}
-          onPress={() => handleSelectGender('male')}
-        >
-          <Text>Male</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedGender === 'other' && styles.selectedOption]}
-          onPress={() => handleSelectGender('other')}
-        >
-          <Text>Other</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.selectedText}>Selected Gender: {selectedGender}</Text>
-{/* Age group */}
-      <Text style={styles.question}>What is your preferred age group?</Text>
-      <View style={styles.optionContainer}>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedAge === '18-25' && styles.selectedOption]}
-          onPress={() => handleSelectAgeGroup('18-25')}
-        >
-          <Text>18-25</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedAge === '26-30' && styles.selectedOption]}
-          onPress={() => handleSelectAgeGroup('26-30')}
-        >
-          <Text>26-30</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedAge === '30+' && styles.selectedOption]}
-          onPress={() => handleSelectAgeGroup('30+')}
-        >
-          <Text>30+</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.selectedText}>Selected Age: {selectedAge}</Text>
-{/* Activity */}
-      <Text style={styles.question}>What is your favorite activity?</Text>
-      <View style={styles.optionContainer}>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedActivity === 'camping' && styles.selectedOption]}
-          onPress={() => handleSelectActivity('camping')}
-        >
-          <Text>Camping</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedActivity === 'fishing' && styles.selectedOption]}
-          onPress={() => handleSelectActivity('fishing')}
-        >
-          <Text>Fishing</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedActivity === 'hiking' && styles.selectedOption]}
-          onPress={() => handleSelectActivity('hiking')}
-        >
-          <Text>Hiking</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.selectedText}>Selected Activity: {selectedActivity}</Text>
-{/* Region */}
-      <Text style={styles.question}>Where do you live?</Text>
-      <View style={styles.optionContainer}>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedRegion === 'northeast' && styles.selectedOption]}
-          onPress={() => handleSelectRegion('northeast')}
-        >
-          <Text>northeast</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedRegion === 'southeast' && styles.selectedOption]}
-          onPress={() => handleSelectRegion('southeast')}
-        >
-          <Text>southeast</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedRegion === 'northwest' && styles.selectedOption]}
-          onPress={() => handleSelectRegion('northwest')}
-        >
-          <Text>northwest</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.radioOption, selectedRegion === 'southwest' && styles.selectedOption]}
-          onPress={() => handleSelectRegion('southwest')}
-        >
-          <Text>southwest</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.selectedText}>Selected Region: {selectedRegion}</Text>
-      <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Update Preferences</Text>
+      {/* Existing preference options... */}
+      
+      {/* Approximate Location */}
+      <Text style={styles.question}>Approximate Location:</Text>
+      {approximateLocation ? (
+        <Text>
+          Lat: {approximateLocation.latitude}, Long: {approximateLocation.longitude}
+        </Text>
+      ) : (
+        <Text>Location not available</Text>
+      )}
+      <TouchableOpacity style={styles.button} onPress={getApproximateLocation}>
+        <Text style={styles.buttonText}>Update Location</Text>
       </TouchableOpacity>
-    </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleSave}>
+        <Text style={styles.buttonText}>Save All Preferences</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

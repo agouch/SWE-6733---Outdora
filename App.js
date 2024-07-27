@@ -40,7 +40,6 @@ function HomeTabs() {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         headerShown: false,
-
       })}
       tabBarOptions={{
         activeTintColor: '#f0a500',
@@ -57,7 +56,6 @@ function HomeTabs() {
 }
 
 export default function App() {
-  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
@@ -99,6 +97,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-
-

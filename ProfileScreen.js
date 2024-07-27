@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Location from 'expo-location';
 
 const ProfileScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -16,6 +17,7 @@ const ProfileScreen = ({ navigation }) => {
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [location, setLocation] = useState(null);
 
   const user = auth.currentUser;
 
@@ -36,12 +38,51 @@ const ProfileScreen = ({ navigation }) => {
         setAge(userData.age ? userData.age.toString() : '');
         setGender(userData.gender || '');
         setImageUri(userData.imageUrl || null);
+        setLocation(userData.location || null);
+      }
+      if (!userDoc.data().location) {
+        getAndSetLocation();
       }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setLoading(false);
     }
+  };
+
+  const getAndSetLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Permission to access location was denied');
+      return;
+    }
+
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = currentLocation.coords;
+    
+    // Round to 2 decimal places for less precision (approx. 1.1km accuracy)
+    const approximateLatitude = Math.round(latitude * 100) / 100;
+    const approximateLongitude = Math.round(longitude * 100) / 100;
+
+    const newLocation = { latitude: approximateLatitude, longitude: approximateLongitude };
+    setLocation(newLocation);
+  };
+
+  const handleUpdateLocation = () => {
+    Alert.alert(
+      "Update Location",
+      "Do you want to update your location?",
+      [
+        {
+          text: "No",
+          style: "cancel"
+        },
+        { 
+          text: "Yes", 
+          onPress: () => getAndSetLocation()
+        }
+      ]
+    );
   };
 
   const handleImagePick = async () => {
@@ -134,6 +175,7 @@ const ProfileScreen = ({ navigation }) => {
         birthdate: birthdate.toISOString(),
         age: calculateAge(birthdate),
         gender,
+        location,
       };
 
       if (imageUrl) {
@@ -232,14 +274,14 @@ const ProfileScreen = ({ navigation }) => {
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
-        placeholderTextColor="#888" // Change this to your desired color
+        placeholderTextColor="#888"
       />
       <TextInput
         style={styles.input}
         placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
-        placeholderTextColor="#888" // Change this to your desired color
+        placeholderTextColor="#888"
       />
       <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
         <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
@@ -259,8 +301,14 @@ const ProfileScreen = ({ navigation }) => {
         placeholder="Gender"
         value={gender}
         onChangeText={setGender}
-        placeholderTextColor="#888" // Change this to your desired color
+        placeholderTextColor="#888"
       />
+      {location && (
+        <Text style={styles.locationText}>Location: {location.latitude}, {location.longitude}</Text>
+      )}
+      <TouchableOpacity style={styles.button} onPress={handleUpdateLocation}>
+        <Text style={styles.buttonText}>Update Location</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
@@ -316,6 +364,10 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   ageText: {
+    fontSize: 17,
+    marginBottom: 10,
+  },
+  locationText: {
     fontSize: 17,
     marginBottom: 10,
   },
