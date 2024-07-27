@@ -16,7 +16,7 @@ const ProfileScreen = ({ navigation }) => {
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
+  const [instagram, setInstagram] = useState('');
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -36,6 +36,7 @@ const ProfileScreen = ({ navigation }) => {
         setAge(userData.age ? userData.age.toString() : '');
         setGender(userData.gender || '');
         setImageUri(userData.imageUrl || null);
+        setInstagram(userData.instagram || '');
       }
       setLoading(false);
     } catch (error) {
@@ -134,6 +135,7 @@ const ProfileScreen = ({ navigation }) => {
         birthdate: birthdate.toISOString(),
         age: calculateAge(birthdate),
         gender,
+        instagram,
       };
 
       if (imageUrl) {
@@ -232,14 +234,14 @@ const ProfileScreen = ({ navigation }) => {
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
-        placeholderTextColor="#888" // Change this to your desired color
+        placeholderTextColor="#888" 
       />
       <TextInput
         style={styles.input}
         placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
-        placeholderTextColor="#888" // Change this to your desired color
+        placeholderTextColor="#888"
       />
       <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
         <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
@@ -259,7 +261,14 @@ const ProfileScreen = ({ navigation }) => {
         placeholder="Gender"
         value={gender}
         onChangeText={setGender}
-        placeholderTextColor="#888" // Change this to your desired color
+        placeholderTextColor="#888" 
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Instagram"
+        value={instagram}
+        onChangeText={setInstagram}
+        placeholderTextColor="#888" 
       />
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
