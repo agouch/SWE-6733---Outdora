@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    padding: 10,
+    padding: 15,
     marginVertical: 8,
     borderWidth: 1,
     borderColor: '#ccc',

@@ -24,6 +24,7 @@ const MessageInput = ({ onSend, autoFocus }) => {
         ref={inputRef}
         style={styles.input}
         placeholder="Type a message"
+        placeholderTextColor="#aaa"
         value={message}
         onChangeText={setMessage}
         keyboardAppearance="light"

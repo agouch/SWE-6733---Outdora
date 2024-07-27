@@ -104,6 +104,7 @@ const MessagingScreen = ({ route, navigation }) => {
               value={messageText}
               onChangeText={setMessageText}
               placeholder="Type a message"
+              placeholderTextColor="#888"
               onFocus={() => setKeyboardOffset(100)} // Ensure offset is set when focusing
               onBlur={() => setKeyboardOffset(0)} // Reset offset when blurring
             />
