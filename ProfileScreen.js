@@ -181,7 +181,7 @@ const ProfileScreen = () => {
       Alert.alert('Permission denied', 'Permission to access location was denied');
       return;
     }
-
+    Alert.alert('Location Updated', 'Your location has been successfully updated.');
     let currentLocation = await Location.getCurrentPositionAsync({});
     const { latitude, longitude } = currentLocation.coords;
     
@@ -193,13 +193,31 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      navigation.replace('Login');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      Alert.alert('Error', 'Failed to log out. Please try again.');
-    }
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Unmatch cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            try {
+              await auth.signOut();
+              navigation.replace('Login');
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to log out. Please try again.');
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const genderOptions = ['Male', 'Female', 'Other'];

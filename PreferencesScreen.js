@@ -172,10 +172,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#b28a68',
   },
   button: {
-    width: '100%',
+    width: '80%',
     padding: 15,
     backgroundColor: '#b28a68',
-    borderRadius: 8,
+    borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
   },
