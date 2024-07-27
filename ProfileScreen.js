@@ -16,6 +16,7 @@ const ProfileScreen = () => {
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [instagramUsername, setInstagramUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [location, setLocation] = useState(null);
@@ -42,6 +43,7 @@ const ProfileScreen = () => {
         setGender(userData.gender || '');
         setImageUri(userData.imageUrl || null);
         setLocation(userData.location || null);
+        setInstagramUsername(userData.instagramUsername || '');
       }
       setLoading(false);
     } catch (error) {
@@ -116,6 +118,7 @@ const ProfileScreen = () => {
         age: calculateAge(birthdate),
         gender,
         location,
+        instagramUsername,
       };
 
       if (imageUrl) {
@@ -316,6 +319,13 @@ const ProfileScreen = () => {
           {gender || 'Select Gender'}
         </Text>
       </TouchableOpacity>
+      <TextInput
+        style={styles.input}
+        placeholder="Instagram Username"
+        value={instagramUsername}
+        onChangeText={setInstagramUsername}
+        placeholderTextColor="#888"
+      />
       {location && (
         <Text style={styles.locationText}>Location: {location.latitude}, {location.longitude}</Text>
       )}
@@ -340,7 +350,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    paddingTop:100,
+    paddingTop: 100,
     backgroundColor: '#fff',
   },
   imageContainer: {
