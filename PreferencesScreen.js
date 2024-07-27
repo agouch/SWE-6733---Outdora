@@ -5,6 +5,75 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import * as Location from 'expo-location';
 import Slider from '@react-native-community/slider';
 
+const stateGrid = [
+  { name: 'Alabama', lat: [30.2, 35.0], lon: [-88.5, -84.9] },
+  { name: 'Alaska', lat: [51.2, 71.5], lon: [-179.1, -129.9] },
+  { name: 'Arizona', lat: [31.3, 37.0], lon: [-114.8, -109.0] },
+  { name: 'Arkansas', lat: [33.0, 36.5], lon: [-94.6, -89.6] },
+  { name: 'California', lat: [32.5, 42.0], lon: [-124.5, -114.1] },
+  { name: 'Colorado', lat: [36.9, 41.0], lon: [-109.1, -102.0] },
+  { name: 'Connecticut', lat: [40.9, 42.1], lon: [-73.7, -71.7] },
+  { name: 'Delaware', lat: [38.4, 39.8], lon: [-75.8, -75.0] },
+  { name: 'Florida', lat: [24.5, 31.0], lon: [-87.6, -79.8] },
+  { name: 'Georgia', lat: [30.4, 35.0], lon: [-85.6, -80.8] },
+  { name: 'Hawaii', lat: [18.9, 20.9], lon: [-155.9, -154.8] },
+  { name: 'Idaho', lat: [42.0, 49.0], lon: [-117.2, -111.0] },
+  { name: 'Illinois', lat: [36.9, 42.5], lon: [-91.5, -87.0] },
+  { name: 'Indiana', lat: [37.8, 41.8], lon: [-88.1, -84.8] },
+  { name: 'Iowa', lat: [40.4, 43.5], lon: [-96.7, -90.1] },
+  { name: 'Kansas', lat: [36.9, 40.1], lon: [-102.1, -94.6] },
+  { name: 'Kentucky', lat: [36.5, 39.1], lon: [-89.6, -81.9] },
+  { name: 'Louisiana', lat: [28.9, 33.0], lon: [-94.0, -88.7] },
+  { name: 'Maine', lat: [43.1, 47.5], lon: [-71.1, -66.9] },
+  { name: 'Maryland', lat: [37.9, 39.7], lon: [-79.5, -75.0] },
+  { name: 'Massachusetts', lat: [41.2, 42.9], lon: [-73.5, -69.9] },
+  { name: 'Michigan', lat: [41.7, 48.3], lon: [-90.5, -82.4] },
+  { name: 'Minnesota', lat: [43.5, 49.4], lon: [-97.2, -89.5] },
+  { name: 'Mississippi', lat: [30.2, 35.0], lon: [-91.7, -88.1] },
+  { name: 'Missouri', lat: [35.9, 40.6], lon: [-95.8, -89.1] },
+  { name: 'Montana', lat: [44.4, 49.0], lon: [-116.1, -104.0] },
+  { name: 'Nebraska', lat: [39.9, 43.0], lon: [-104.1, -95.3] },
+  { name: 'Nevada', lat: [35.0, 42.0], lon: [-120.0, -114.0] },
+  { name: 'New Hampshire', lat: [42.7, 45.3], lon: [-72.6, -70.7] },
+  { name: 'New Jersey', lat: [38.9, 41.4], lon: [-75.6, -73.9] },
+  { name: 'New Mexico', lat: [31.3, 37.0], lon: [-109.1, -103.0] },
+  { name: 'New York', lat: [40.5, 45.0], lon: [-79.8, -71.9] },
+  { name: 'North Carolina', lat: [33.8, 36.6], lon: [-84.3, -75.5] },
+  { name: 'North Dakota', lat: [45.9, 49.0], lon: [-104.0, -96.6] },
+  { name: 'Ohio', lat: [38.4, 41.9], lon: [-84.8, -80.5] },
+  { name: 'Oklahoma', lat: [33.6, 37.0], lon: [-103.0, -94.4] },
+  { name: 'Oregon', lat: [41.9, 46.3], lon: [-124.6, -116.5] },
+  { name: 'Pennsylvania', lat: [39.7, 42.3], lon: [-80.5, -74.7] },
+  { name: 'Rhode Island', lat: [41.1, 42.0], lon: [-71.9, -71.1] },
+  { name: 'South Carolina', lat: [32.0, 35.2], lon: [-83.3, -78.5] },
+  { name: 'South Dakota', lat: [42.5, 45.9], lon: [-104.1, -96.4] },
+  { name: 'Tennessee', lat: [34.9, 36.7], lon: [-90.3, -81.6] },
+  { name: 'Texas', lat: [25.8, 36.5], lon: [-106.6, -93.5] },
+  { name: 'Utah', lat: [36.9, 42.0], lon: [-114.1, -109.0] },
+  { name: 'Vermont', lat: [42.7, 45.0], lon: [-73.4, -71.5] },
+  { name: 'Virginia', lat: [36.5, 39.5], lon: [-83.7, -75.2] },
+  { name: 'Washington', lat: [45.5, 49.0], lon: [-124.8, -116.9] },
+  { name: 'West Virginia', lat: [37.2, 40.7], lon: [-82.6, -77.7] },
+  { name: 'Wisconsin', lat: [42.5, 47.3], lon: [-92.9, -86.8] },
+  { name: 'Wyoming', lat: [40.9, 45.1], lon: [-111.1, -104.0] },
+];
+
+
+
+const getStateFromCoordinates = (latitude, longitude) => {
+  for (const state of stateGrid) {
+    if (
+      latitude >= state.lat[0] &&
+      latitude <= state.lat[1] &&
+      longitude >= state.lon[0] &&
+      longitude <= state.lon[1]
+    ) {
+      return state.name;
+    }
+  }
+  return 'Unknown';
+};
+
 const PreferencesScreen = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
@@ -14,6 +83,7 @@ const PreferencesScreen = ({ navigation }) => {
   const [bikingSkill, setBikingSkill] = useState(0);
   const [runningSkill, setRunningSkill] = useState(0);
   const [approximateLocation, setApproximateLocation] = useState(null);
+  const [state, setState] = useState('');
   const [loading, setLoading] = useState(true);
 
   const handleSelectGender = (gender) => {
@@ -46,6 +116,7 @@ const PreferencesScreen = ({ navigation }) => {
           setBikingSkill(userData.bikingSkill || 0);
           setRunningSkill(userData.runningSkill || 0);
           setApproximateLocation(userData.approximateLocation || null);
+          setState(userData.state || '');
         }
       } catch (error) {
         console.error('Error fetching user preferences:', error);
@@ -78,8 +149,11 @@ const PreferencesScreen = ({ navigation }) => {
       const approximateLongitude = Math.round(longitude * 100) / 100;
 
       setApproximateLocation({ latitude: approximateLatitude, longitude: approximateLongitude });
+
+      const state = getStateFromCoordinates(approximateLatitude, approximateLongitude);
+      setState(state);
     } catch (error) {
-      console.error('Error getting location:', error);
+      console.error('Error getting location or state:', error);
     }
   };
 
@@ -95,7 +169,8 @@ const PreferencesScreen = ({ navigation }) => {
           hikingSkill,
           bikingSkill,
           runningSkill,
-          approximateLocation
+          approximateLocation,
+          state
         }, { merge: true });
 
         Alert.alert('Preferences Updated', 'Your preferences and approximate location have been updated successfully.');
@@ -197,6 +272,7 @@ const PreferencesScreen = ({ navigation }) => {
       ) : (
         <Text>Location not available</Text>
       )}
+      <Text style={styles.question}>State: {state}</Text>
       <TouchableOpacity style={styles.button} onPress={getApproximateLocation}>
         <Text style={styles.buttonText}>Update Location</Text>
       </TouchableOpacity>
@@ -213,7 +289,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100,
     padding: 20,
   },
   title: {
