@@ -42,9 +42,10 @@ function HomeTabs() {
       }}
     >
       <Tab.Screen name="MatchingTab" component={MatchingScreen} options={{ title: 'Home' }} />
-      <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: 'Profile' }} />
       <Tab.Screen name="MatchesTab" component={ChatListScreen} options={{ title: 'Matches' }} />
+      <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: 'Profile' }} />
       <Tab.Screen name="PreferencesTab" component={PreferencesScreen} options={{ title: 'Preferences' }} />
+      
     </Tab.Navigator>
   );
 }
