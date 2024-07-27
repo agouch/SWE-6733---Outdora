@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Platform, Modal } from 'react-native';
 import { auth, firestore, storage } from './firebaseConfig';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 
 const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
@@ -19,6 +19,7 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [location, setLocation] = useState(null);
+  const [showGenderModal, setShowGenderModal] = useState(false);
 
   const navigation = useNavigation();
   const user = auth.currentUser;
@@ -165,28 +166,13 @@ const ProfileScreen = () => {
   };
 
   const calculateAge = (birthdate) => {
-    const birthDate = new Date(birthdate);
     const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      return age - 1;
+    let age = today.getFullYear() - birthdate.getFullYear();
+    const m = today.getMonth() - birthdate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+      age--;
     }
-
     return age;
-  };
-
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };
-
-  const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setBirthdate(selectedDate);
-      setAge(calculateAge(selectedDate));
-    }
   };
 
   const handleUpdateLocation = async () => {
@@ -215,6 +201,39 @@ const ProfileScreen = () => {
       Alert.alert('Error', 'Failed to log out. Please try again.');
     }
   };
+
+  const genderOptions = ['Male', 'Female', 'Other'];
+
+  const renderGenderModal = () => (
+    <Modal
+      visible={showGenderModal}
+      transparent={true}
+      animationType="slide"
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          {genderOptions.map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={styles.modalOption}
+              onPress={() => {
+                setGender(option);
+                setShowGenderModal(false);
+              }}
+            >
+              <Text style={styles.modalOptionText}>{option}</Text>
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity
+            style={[styles.modalOption, styles.cancelOption]}
+            onPress={() => setShowGenderModal(false)}
+          >
+            <Text style={styles.cancelOptionText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   if (loading) {
     return (
@@ -247,26 +266,35 @@ const ProfileScreen = () => {
         onChangeText={setLastName}
         placeholderTextColor="#888"
       />
-      <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
-        <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
+        <Text style={birthdate ? styles.inputText : styles.placeholderText}>
+          {birthdate ? birthdate.toDateString() : 'Select Birthdate'}
+        </Text>
       </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
           value={birthdate}
           mode="date"
           display="default"
-          onChange={onDateChange}
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(Platform.OS === 'ios');
+            if (selectedDate) {
+              setBirthdate(selectedDate);
+              setAge(calculateAge(selectedDate).toString());
+            }
+          }}
           maximumDate={new Date()}
         />
       )}
       <Text style={styles.ageText}>Age: {age}</Text>
-      <TextInput
+      <TouchableOpacity
         style={styles.input}
-        placeholder="Gender"
-        value={gender}
-        onChangeText={setGender}
-        placeholderTextColor="#888"
-      />
+        onPress={() => setShowGenderModal(true)}
+      >
+        <Text style={gender ? styles.inputText : styles.placeholderText}>
+          {gender || 'Select Gender'}
+        </Text>
+      </TouchableOpacity>
       {location && (
         <Text style={styles.locationText}>Location: {location.latitude}, {location.longitude}</Text>
       )}
@@ -282,6 +310,7 @@ const ProfileScreen = () => {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+      {renderGenderModal()}
     </ScrollView>
   );
 };
@@ -290,8 +319,8 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
+    paddingTop:100,
     backgroundColor: '#fff',
-    justifyContent: 'center',
   },
   imageContainer: {
     width: 150,
@@ -317,25 +346,22 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    fontSize: 16,
   },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    justifyContent: 'center',
+  inputText: {
+    fontSize: 16,
+    color: '#333',
   },
-  dateText: {
-    fontSize: 17,
+  placeholderText: {
+    fontSize: 16,
     color: '#888',
   },
   ageText: {
-    fontSize: 17,
+    fontSize: 16,
     marginBottom: 10,
   },
   locationText: {
-    fontSize: 17,
+    fontSize: 16,
     marginBottom: 10,
   },
   button: {
@@ -344,10 +370,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   deleteButton: {
     backgroundColor: '#FF3B30',
@@ -362,6 +384,40 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+  },
+  modalOption: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalOptionText: {
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  cancelOption: {
+    borderBottomWidth: 0,
+    marginTop: 10,
+  },
+  cancelOptionText: {
+    color: 'red',
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
 
