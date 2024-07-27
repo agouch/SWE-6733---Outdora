@@ -283,18 +283,21 @@ const ProfileScreen = ({ navigation }) => {
         onChangeText={setLastName}
         placeholderTextColor="#888"
       />
-      <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
-        <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={birthdate}
-          mode="date"
-          display="default"
-          onChange={onDateChange}
-          maximumDate={new Date()}
-        />
-      )}
+      <View style={styles.datePickerContainer}>
+        <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
+          <Text style={styles.dateText}>{birthdate ? birthdate.toDateString() : 'Select Birthdate'}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={birthdate}
+            mode="date"
+            display="default"
+            onChange={onDateChange}
+            maximumDate={new Date()}
+            style={styles.dateTimePicker}
+          />
+        )}
+      </View>
       <Text style={styles.ageText}>Age: {age}</Text>
       <TextInput
         style={styles.input}
@@ -351,17 +354,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
   },
+  datePickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
   dateInput: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 10,
-    marginBottom: 10,
     borderRadius: 5,
     justifyContent: 'center',
   },
   dateText: {
     fontSize: 17,
     color: '#888',
+  },
+  dateTimePicker: {
+    flex: 1,
+    marginLeft: 10,
   },
   ageText: {
     fontSize: 17,
