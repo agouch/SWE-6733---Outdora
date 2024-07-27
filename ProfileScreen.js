@@ -266,26 +266,29 @@ const ProfileScreen = () => {
         onChangeText={setLastName}
         placeholderTextColor="#888"
       />
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-        <Text style={birthdate ? styles.inputText : styles.placeholderText}>
-          {birthdate ? birthdate.toDateString() : 'Select Birthdate'}
-        </Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={birthdate}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(Platform.OS === 'ios');
-            if (selectedDate) {
-              setBirthdate(selectedDate);
-              setAge(calculateAge(selectedDate).toString());
-            }
-          }}
-          maximumDate={new Date()}
-        />
-      )}
+      <View style={styles.datePickerContainer}>
+        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInput}>
+          <Text style={birthdate ? styles.inputText : styles.placeholderText}>
+            {birthdate ? birthdate.toDateString() : 'Select Birthdate'}
+          </Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={birthdate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(Platform.OS === 'ios');
+              if (selectedDate) {
+                setBirthdate(selectedDate);
+                setAge(calculateAge(selectedDate).toString());
+              }
+            }}
+            style={styles.dateTimePicker}
+            maximumDate={new Date()}
+          />
+        )}
+      </View>
       <Text style={styles.ageText}>Age: {age}</Text>
       <TouchableOpacity
         style={styles.input}
@@ -339,6 +342,24 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     color: '#888',
+  },
+  datePickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  dateInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  dateTimePicker: {
+    flex: 1,
+    marginLeft: 10,
   },
   input: {
     borderWidth: 1,
