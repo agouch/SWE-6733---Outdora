@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { doc, getDoc, addDoc, updateDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { auth, firestore } from './firebaseConfig';
-import { Ionicons } from '@expo/vector-icons'; // Make sure to install this package if you haven't already
+import { auth, firestore, storage } from './firebaseConfig';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const MessagingScreen = ({ route, navigation }) => {
   const { matchId, recipientId } = route.params;
@@ -45,7 +47,6 @@ const MessagingScreen = ({ route, navigation }) => {
       const recipientRef = doc(firestore, 'users', recipientId);
       const recipientDoc = await getDoc(recipientRef);
       if (recipientDoc.exists()) {
-        console.log('Recipient data:', recipientDoc.data());
         setRecipient(recipientDoc.data());
       } else {
         console.log('Recipient does not exist');
@@ -55,12 +56,13 @@ const MessagingScreen = ({ route, navigation }) => {
     }
   };
 
-  const sendMessage = async () => {
-    if (messageText.trim() === '') return;
+  const sendMessage = async (text, imageUrl = null) => {
+    if (text.trim() === '' && !imageUrl) return;
 
     try {
       await addDoc(collection(firestore, 'matches', matchId, 'messages'), {
-        text: messageText,
+        text,
+        imageUrl,
         createdAt: new Date(),
         senderId: user.uid,
       });
@@ -115,6 +117,57 @@ const MessagingScreen = ({ route, navigation }) => {
     );
   };
 
+  const handleImagePick = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission required", "You need to allow access to your photos to upload an image.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const { uri } = result.assets[0];
+      await sendImageMessage(uri);
+    }
+  };
+
+  const sendImageMessage = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const filename = `messages/${user.uid}_${Date.now()}.jpg`;
+      const storageRef = ref(storage, filename);
+      const snapshot = await uploadBytes(storageRef, blob);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+
+      await sendMessage('', downloadUrl);
+    } catch (error) {
+      console.error('Error sending image message:', error);
+    }
+  };
+
+  const renderMessageItem = ({ item }) => {
+    if (item.imageUrl) {
+      return (
+        <View style={[styles.message, item.senderId === user.uid ? styles.myMessage : styles.theirMessage]}>
+          <Image source={{ uri: item.imageUrl }} style={styles.messageImage} />
+        </View>
+      );
+    } else {
+      return (
+        <View style={[styles.message, item.senderId === user.uid ? styles.myMessage : styles.theirMessage]}>
+          <Text style={styles.messageText}>{item.text}</Text>
+        </View>
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -142,16 +195,15 @@ const MessagingScreen = ({ route, navigation }) => {
             </View>
             <FlatList
               data={messages}
-              renderItem={({ item }) => (
-                <View style={[styles.message, item.senderId === user.uid ? styles.myMessage : styles.theirMessage]}>
-                  <Text style={styles.messageText}>{item.text}</Text>
-                </View>
-              )}
+              renderItem={renderMessageItem}
               keyExtractor={item => item.id}
               contentContainerStyle={styles.messageList}
               onScrollBeginDrag={Keyboard.dismiss}
             />
             <View style={styles.inputContainer}>
+              <TouchableOpacity onPress={handleImagePick} style={styles.imagePickerButton}>
+                <Ionicons name="image" size={24} color="#007AFF" />
+              </TouchableOpacity>
               <TextInput
                 style={styles.input}
                 value={messageText}
@@ -161,7 +213,7 @@ const MessagingScreen = ({ route, navigation }) => {
                 onFocus={() => setKeyboardOffset(100)}
                 onBlur={() => setKeyboardOffset(0)}
               />
-              <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+              <TouchableOpacity style={styles.sendButton} onPress={() => sendMessage(messageText)}>
                 <Text style={styles.sendButtonText}>Send</Text>
               </TouchableOpacity>
             </View>
@@ -247,12 +299,20 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
   },
+  messageImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
+  },
+  imagePickerButton: {
+    marginRight: 10,
   },
   input: {
     flex: 1,
