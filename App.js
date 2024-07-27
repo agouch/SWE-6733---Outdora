@@ -34,18 +34,18 @@ function HomeTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: '#f0a500',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          display: 'flex',
+        },
         headerShown: false,
       })}
-      tabBarOptions={{
-        activeTintColor: '#f0a500',
-        inactiveTintColor: 'gray',
-      }}
     >
       <Tab.Screen name="MatchingTab" component={MatchingScreen} options={{ title: 'Home' }} />
       <Tab.Screen name="MatchesTab" component={ChatListScreen} options={{ title: 'Matches' }} />
       <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: 'Profile' }} />
       <Tab.Screen name="PreferencesTab" component={PreferencesScreen} options={{ title: 'Preferences' }} />
-      
     </Tab.Navigator>
   );
 }
@@ -53,27 +53,37 @@ function HomeTabs() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="Login"
-        screenOptions={{
-          headerShown: false,
-          gestureEnabled: false, // This disables the swipe gesture for all screens
-        }}
-      >
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen} 
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
         <Stack.Screen 
           name="Home" 
           component={HomeTabs} 
           options={{
-            gestureEnabled: false,
+            headerShown: false,
+            gestureEnabled: false, // Disable gestures for Home screen
           }}
         />
         <Stack.Screen 
           name="Messages" 
           component={MessagingScreen}
           options={{
-            gestureEnabled: false,
+            headerShown: false,
+            gestureEnabled: true, // Enable gestures for Messages screen
           }}
         />
       </Stack.Navigator>
