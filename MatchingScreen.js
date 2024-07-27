@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, InteractionManager, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, Alert, InteractionManager, TouchableOpacity, Dimensions, Image, Linking } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { auth, firestore } from './firebaseConfig';
 import { collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -113,6 +113,7 @@ const MatchingScreen = () => {
         gender: match.gender || 'Unknown',
         imageUrl: match.imageUrl || null,
         distance: match.distance !== undefined ? match.distance.toFixed(2) : 'Unknown',
+        instagramUsername: match.instagramUsername || null,
         users: [user.uid, match.id],
         chats: []
       }));
@@ -248,6 +249,11 @@ const MatchingScreen = () => {
           <Text style={styles.usernameText}>@{item.username}</Text>
           <Text style={styles.genderText}>{item.gender}</Text>
           <Text style={styles.distanceText}>Distance: {item.distance} miles</Text>
+          {item.instagramUsername && (
+            <TouchableOpacity onPress={() => Linking.openURL(`https://instagram.com/${item.instagramUsername}`)}>
+              <Text style={styles.instagramLink}>Instagram: @{item.instagramUsername}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
@@ -395,6 +401,16 @@ const styles = StyleSheet.create({
   genderText: {
     fontSize: 20,
     color: '#757575',
+    marginTop: 10,
+  },
+  distanceText: {
+    fontSize: 20,
+    color: '#757575',
+    marginTop: 10,
+  },
+  instagramLink: {
+    fontSize: 20,
+    color: '#007AFF',
     marginTop: 10,
   },
   noMoreMatchesText: {
