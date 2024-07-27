@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback, SafeAreaView, StatusBar } from 'react-native';
 import { doc, getDoc, addDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { auth, firestore } from './firebaseConfig';
+import { Ionicons } from '@expo/vector-icons'; // Make sure to install this package if you haven't already
 
 const MessagingScreen = ({ route, navigation }) => {
   const { matchId, recipientId } = route.params;
@@ -70,55 +71,65 @@ const MessagingScreen = ({ route, navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={100} // Fixed offset value
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            {recipient.imageUrl ? (
-              <Image source={{ uri: recipient.imageUrl }} style={styles.profileImage} />
-            ) : (
-              <View style={styles.profileImagePlaceholder}>
-                <Text style={styles.profileImageText}>{recipient.first_name ? recipient.first_name[0] : 'U'}</Text>
-              </View>
-            )}
-            <Text style={styles.headerText}>{recipient.first_name || 'Chat'}</Text>
-          </View>
-          <FlatList
-            data={messages}
-            renderItem={({ item }) => (
-              <View style={[styles.message, item.senderId === user.uid ? styles.myMessage : styles.theirMessage]}>
-                <Text style={styles.messageText}>{item.text}</Text>
-              </View>
-            )}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.messageList}
-            onScrollBeginDrag={Keyboard.dismiss} // Dismiss keyboard when scrolling starts
-          />
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={messageText}
-              onChangeText={setMessageText}
-              placeholder="Type a message"
-              placeholderTextColor="#888"
-              onFocus={() => setKeyboardOffset(100)} // Ensure offset is set when focusing
-              onBlur={() => setKeyboardOffset(0)} // Reset offset when blurring
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="#007AFF" />
+              </TouchableOpacity>
+              {recipient.imageUrl ? (
+                <Image source={{ uri: recipient.imageUrl }} style={styles.profileImage} />
+              ) : (
+                <View style={styles.profileImagePlaceholder}>
+                  <Text style={styles.profileImageText}>{recipient.first_name ? recipient.first_name[0] : 'U'}</Text>
+                </View>
+              )}
+              <Text style={styles.headerText}>{recipient.first_name || 'Chat'}</Text>
+            </View>
+            <FlatList
+              data={messages}
+              renderItem={({ item }) => (
+                <View style={[styles.message, item.senderId === user.uid ? styles.myMessage : styles.theirMessage]}>
+                  <Text style={styles.messageText}>{item.text}</Text>
+                </View>
+              )}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.messageList}
+              onScrollBeginDrag={Keyboard.dismiss}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-              <Text style={styles.sendButtonText}>Send</Text>
-            </TouchableOpacity>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={messageText}
+                onChangeText={setMessageText}
+                placeholder="Type a message"
+                placeholderTextColor="#888"
+                onFocus={() => setKeyboardOffset(100)}
+                onBlur={() => setKeyboardOffset(0)}
+              />
+              <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+                <Text style={styles.sendButtonText}>Send</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -129,6 +140,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+  },
+  backButton: {
+    padding: 10,
+    marginRight: 10,
   },
   profileImage: {
     width: 40,
