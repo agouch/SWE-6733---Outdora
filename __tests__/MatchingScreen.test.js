@@ -49,7 +49,6 @@ describe('MatchingScreen', () => {
   });
 
 
-  
   /*it('fetches and displays matches correctly', async () => {
     getDoc.mockResolvedValueOnce({
       exists: () => true,
