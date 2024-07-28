@@ -45,13 +45,30 @@ describe('MessageInput', () => {
     const input = getByPlaceholderText('Type a message');
     const sendButton = getByText('Send');
 
-
     fireEvent.press(sendButton);
     expect(onSendMock).not.toHaveBeenCalled();
 
- 
     fireEvent.changeText(input, 'Hello');
     fireEvent.press(sendButton);
     expect(onSendMock).toHaveBeenCalledWith('Hello');
+  });
+
+  it('displays placeholder text correctly', () => {
+    const { getByPlaceholderText } = render(<MessageInput />);
+    const input = getByPlaceholderText('Type a message');
+    expect(input.props.placeholder).toBe('Type a message');
+  });
+
+  it('handles input changes correctly', () => {
+    const { getByPlaceholderText } = render(<MessageInput />);
+    const input = getByPlaceholderText('Type a message');
+    fireEvent.changeText(input, 'New message');
+    expect(input.props.value).toBe('New message');
+  });
+
+  it('sets the correct keyboard appearance', () => {
+    const { getByPlaceholderText } = render(<MessageInput />);
+    const input = getByPlaceholderText('Type a message');
+    expect(input.props.keyboardAppearance).toBe('light');
   });
 });
