@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Alert, InteractionManager, TouchableOpacity, Dimensions, Image, Linking } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { auth, firestore } from './firebaseConfig';
 import { collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-native-get-random-values';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const { width, height } = Dimensions.get('window');
@@ -17,10 +17,6 @@ const MatchingScreen = () => {
   const swiperRef = React.useRef(null);
 
   const user = auth.currentUser;
-
-  useEffect(() => {
-    fetchPotentialMatches(); 
-  }, []);
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     console.log(`Calculating distance between (${lat1}, ${lon1}) and (${lat2}, ${lon2})`);
@@ -37,7 +33,7 @@ const MatchingScreen = () => {
     return distance;
   };
 
-  const fetchPotentialMatches = async () => {
+  const fetchPotentialMatches = useCallback(async () => {
     try {
       console.log('Fetching potential matches...');
       
@@ -46,46 +42,46 @@ const MatchingScreen = () => {
       const currentUserData = currentUserDoc.data();
       console.log('Current user data:', currentUserData);
       console.log('Current user location:', currentUserData.location);
-  
+
       const userRange = currentUserData.range || 100; // Default to 100 if range is not set
       console.log('User range:', userRange);
       
       // Get the current user's rightSwipes
       const currentUserRightSwipes = currentUserData.rightSwipes || [];
-  
+
       const usersCollection = collection(firestore, 'users');
       const usersSnapshot = await getDocs(usersCollection);
-  
+
       console.log('Total users found:', usersSnapshot.size);
-  
+
       const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       console.log('All users:', allUsers);
-  
+
       const filteredMatches = allUsers.filter(otherUser => {
         console.log('Checking user:', otherUser.id);
         console.log('Other user data:', otherUser);
-  
+
         if (otherUser.id === user.uid) {
           console.log('Skipping current user');
           return false;
         }
-  
+
         if (currentUserData.rejectedUsers && currentUserData.rejectedUsers.includes(otherUser.id)) {
           console.log('User already rejected');
           return false;
         }
-  
+
         if (currentUserData.matches && currentUserData.matches.some(match => match.users.includes(otherUser.id))) {
           console.log('User already matched');
           return false;
         }
-  
+
         // Check if the user has already been swiped right on
         if (currentUserRightSwipes.includes(otherUser.id)) {
           console.log('User already swiped right on');
           return false;
         }
-  
+
         // Calculate distance if both users have location
         if (currentUserData.location && otherUser.location) {
           console.log('Current user location:', currentUserData.location);
@@ -99,7 +95,7 @@ const MatchingScreen = () => {
           );
           otherUser.distance = distance;
           console.log(`Distance to ${otherUser.firstname}: ${distance.toFixed(2)} mi`);
-  
+
           // Apply the user's range preference
           if (distance > userRange) {
             console.log('User too far away');
@@ -110,13 +106,13 @@ const MatchingScreen = () => {
           console.log('Current user location:', currentUserData.location);
           console.log('Other user location:', otherUser.location);
         }
-  
+
         console.log('User passed all filters');
         return true;
       });
-  
+
       console.log('Filtered matches:', filteredMatches);
-  
+
       const matchesWithUsersAndChats = filteredMatches.map(match => ({
         id: uuidv4(),
         username: match.username || 'Unknown',
@@ -130,9 +126,9 @@ const MatchingScreen = () => {
         users: [user.uid, match.id],
         chats: []
       }));
-  
+
       console.log('Matches with users and chats:', matchesWithUsersAndChats);
-  
+
       InteractionManager.runAfterInteractions(() => {
         setPotentialMatches(matchesWithUsersAndChats);
         setLoading(false);
@@ -142,8 +138,14 @@ const MatchingScreen = () => {
       Alert.alert('Error', `Error fetching potential matches: ${error.message}`);
       setLoading(false);
     }
-  };
-  
+  }, [user.uid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPotentialMatches();
+    }, [fetchPotentialMatches])
+  );
+
   const handleSwipeRight = async (cardIndex) => {
     if (cardIndex >= potentialMatches.length) {
       Alert.alert('No more matches', 'You have viewed all potential matches.');
@@ -391,7 +393,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E8E8E8',
     justifyContent: 'center',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    paddingBottom: 50,
   },
   cardImage: {
     width: '100%',
@@ -400,7 +403,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   cardContent: {
-    padding: 20,
+    padding: 60,
   },
   nameText: {
     fontSize: 32,
