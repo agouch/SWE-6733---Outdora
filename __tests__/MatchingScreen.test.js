@@ -22,6 +22,8 @@ jest.mock('firebase/firestore', () => ({
   doc: jest.fn(),
   getDoc: jest.fn(),
   updateDoc: jest.fn(),
+  arrayUnion: jest.fn(),
+  arrayRemove: jest.fn(),
 }));
 
 const mockNavigation = { navigate: jest.fn() };
@@ -35,7 +37,7 @@ const renderWithNavigation = (component) => {
 };
 
 describe('MatchingScreen', () => {
-  beforeEach(() => {
+  beforeEach(() => { 
     jest.clearAllMocks();
   });
 

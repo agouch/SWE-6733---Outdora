@@ -2,8 +2,9 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import MessagingScreen from '../MessagingScreen';
 import { auth, firestore } from '../firebaseConfig';
-import { doc, getDoc, updateDoc, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot, orderBy, query, collection, addDoc } from 'firebase/firestore';
 import { Alert } from 'react-native';
+
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'unique-id'),
 }));
@@ -20,17 +21,19 @@ jest.mock('firebase/firestore', () => {
   return {
     ...originalFirestore,
     collection: jest.fn(),
-    getDocs: jest.fn(),
-    doc: jest.fn(),
+    addDoc: jest.fn(),
     getDoc: jest.fn(),
     updateDoc: jest.fn(),
     onSnapshot: jest.fn(),
     orderBy: jest.fn(),
     query: jest.fn(),
+    doc: jest.fn(),
   };
 });
+
 jest.spyOn(Alert, 'alert');
-const mockNavigation = { navigate: jest.fn() };
+
+const mockNavigation = { navigate: jest.fn(), goBack: jest.fn() };
 const mockRoute = { params: { matchId: 'match1', recipientId: 'user2' } };
 
 describe('MessagingScreen', () => {
@@ -82,6 +85,7 @@ describe('MessagingScreen', () => {
       expect(getByText('Hello')).toBeTruthy();
     });
   });
+
   it('triggers the unmatch function', async () => {
     const { getByText } = render(<MessagingScreen route={mockRoute} navigation={mockNavigation} />);
     
@@ -97,31 +101,21 @@ describe('MessagingScreen', () => {
       );
     });
   });
-  
-  it('sends a new message and updates DB', async () => {
-    doc.mockImplementation(() => ({ id: 'mockId' }));
 
-    getDoc.mockImplementation(() =>
-      Promise.resolve({
-        exists: () => true,
-        data: () => ({
-          matches: [{ id: 'match1', chats: [] }],
-        }),
-      })
-    );
+  it('should send a message successfully', async () => {
+    const text = 'Test message';
+    const collectionReference = 'collectionReference';
+    
+    collection.mockReturnValueOnce(collectionReference);
+    addDoc.mockResolvedValueOnce();
 
     const { getByPlaceholderText, getByText } = render(<MessagingScreen route={mockRoute} navigation={mockNavigation} />);
-
-    fireEvent.changeText(getByPlaceholderText('Type a message'), 'New message');
-    const sendButton = getByText('Send');
-    fireEvent.press(sendButton);
+    
+    fireEvent.changeText(getByPlaceholderText('Type a message'), text);
+    fireEvent.press(getByText('Send'));
 
     await waitFor(() => {
-      console.log('Calls to updateDoc:', updateDoc.mock.calls);
-      expect(updateDoc).toHaveBeenCalledWith(
-        { id: 'mockId' }, 
-        { matches: expect.any(Array) }
-      );
+      expect(collection).toHaveBeenCalledWith(firestore, 'matches', 'match1', 'messages');
     });
   });
 });
