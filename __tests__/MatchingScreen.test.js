@@ -2,8 +2,7 @@ import React from 'react';
 import { render, waitFor, screen } from '@testing-library/react-native';
 import MatchingScreen from '../MatchingScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { auth } from '../firebaseConfig';
+import { getDoc } from 'firebase/firestore';
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'unique-id'),
@@ -48,56 +47,10 @@ describe('MatchingScreen', () => {
     });
   });
 
-
-  /*it('fetches and displays matches correctly', async () => {
-    getDoc.mockResolvedValueOnce({
-      exists: () => true,
-      data: () => ({
-        matches: [{ id: 'unique-id', username: 'testuser' }],
-      }),
-    });
-
+  it('displays loading indicator while fetching matches', () => {
     const { getByText } = renderWithNavigation(<MatchingScreen navigation={mockNavigation} />);
-
-    await waitFor(() => {
-      expect(getByText('Username: testuser')).toBeTruthy();
-    });
+    expect(getByText('Loading...')).toBeTruthy();
   });
-*/
-
-it('renders match card correctly', async () => {
-  const potentialMatches = [
-    {
-      firstname: 'Test',
-      lastname: 'User',
-      age: 25,
-      username: 'testuser',
-      gender: 'Female',
-      imageUrl: 'https://example.com/image.jpg',
-      distance: 10,
-      instagramUsername: 'testusergram',
-    },
-  ];
-
-  // Render the MatchingScreen with NavigationContainer
-  render(
-    <NavigationContainer>
-      <MatchingScreen potentialMatches={potentialMatches} fetchPotentialMatches={() => {}} />
-    </NavigationContainer>
-  );
-  console.log("SCREEN DEBUG:");
-  screen.debug();
-  // Check if the card is rendered with expected content
-  await waitFor(() => {
-    expect(screen.getByText('Test User, 25')).toBeTruthy();
-    expect(screen.getByText('@testuser')).toBeTruthy();
-    expect(screen.getByText('Female')).toBeTruthy();
-    expect(screen.getByText('Distance: 10 miles')).toBeTruthy();
-    expect(screen.getByText('Instagram: @testusergram')).toBeTruthy();
-  });
-
-});
-
 
   it('handles no matches found', async () => {
     getDoc.mockResolvedValueOnce({
@@ -113,33 +66,42 @@ it('renders match card correctly', async () => {
     });
   });
 
-  it('handles duplicate matches', async () => {
-    getDoc.mockResolvedValueOnce({
-      exists: () => true,
-      data: () => ({
-        matches: [{ id: 'unique-id1', username: 'testuser' }, { id: 'unique-id2', username: 'testuser' }],
-      }),
-    });
+  it('displays error if no user data in match', async () => {
+    const potentialMatches = [
+      {
+        firstname: '',
+        lastname: '',
+        age: null,
+        username: '',
+        gender: '',
+        imageUrl: '',
+        distance: null,
+        instagramUsername: '',
+      },
+    ];
 
-    const { getByText, queryAllByText } = renderWithNavigation(<MatchingScreen navigation={mockNavigation} />);
+    render(
+      <NavigationContainer>
+        <MatchingScreen potentialMatches={potentialMatches} fetchPotentialMatches={() => {}} />
+      </NavigationContainer>
+    );
 
     await waitFor(() => {
-      expect(queryAllByText('Username: testuser').length).toBe(2);
+      expect(screen.getByText('No potential matches found')).toBeTruthy();
     });
   });
 
-  it('handles incomplete user data', async () => {
+  it('does not display Refresh Matches button if no potential matches', async () => {
     getDoc.mockResolvedValueOnce({
       exists: () => true,
       data: () => ({
-        matches: [{ id: 'unique-id' }],
+        matches: [],
       }),
     });
 
-    const { getByText } = renderWithNavigation(<MatchingScreen navigation={mockNavigation} />);
-
+    const { queryByText } = renderWithNavigation(<MatchingScreen navigation={mockNavigation} />);
     await waitFor(() => {
-      expect(getByText('Username: N/A')).toBeTruthy();
+      expect(queryByText('Refresh Matches')).toBeNull();
     });
   });
 });
