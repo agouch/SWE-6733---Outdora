@@ -86,7 +86,7 @@ const MessagingScreen = ({ route, navigation }) => {
           text: 'Unmatch',
           onPress: async () => {
             try {
-              const userRef = doc(firestore, 'users', user.uid);
+              const userRef = doc(firestore, 'users', user.uid); 
               const recipientRef = doc(firestore, 'users', recipientId);
 
               const userDoc = await getDoc(userRef);
