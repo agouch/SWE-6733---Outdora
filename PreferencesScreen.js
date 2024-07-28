@@ -58,8 +58,6 @@ const stateGrid = [
   { name: 'Wyoming', lat: [40.9, 45.1], lon: [-111.1, -104.0] },
 ];
 
-
-
 const getStateFromCoordinates = (latitude, longitude) => {
   for (const state of stateGrid) {
     if (
@@ -78,6 +76,7 @@ const PreferencesScreen = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedAge, setSelectedAge] = useState('');
+  const [range, setRange] = useState(0);
   const [climbingSkill, setClimbingSkill] = useState(0);
   const [hikingSkill, setHikingSkill] = useState(0);
   const [bikingSkill, setBikingSkill] = useState(0);
@@ -97,6 +96,7 @@ const PreferencesScreen = ({ navigation }) => {
   const handleSelectAgeGroup = (ageGroup) => {
     setSelectedAge(ageGroup);
   };
+
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -110,6 +110,7 @@ const PreferencesScreen = ({ navigation }) => {
           setSelectedGender(userData.selectedGender || '');
           setSelectedActivity(userData.selectedActivity || '');
           setSelectedAge(userData.selectedAge || '');
+          setRange(userData.range || 0);
           setClimbingSkill(userData.climbingSkill || 0);
           setHikingSkill(userData.hikingSkill || 0);
           setBikingSkill(userData.bikingSkill || 0);
@@ -164,12 +165,13 @@ const PreferencesScreen = ({ navigation }) => {
           selectedGender,
           selectedActivity,
           selectedAge,
+          range,
           climbingSkill,
           hikingSkill,
           bikingSkill,
           runningSkill,
           approximateLocation,
-          state
+          state,
         }, { merge: true });
 
         Alert.alert('Preferences Updated', 'Your preferences and approximate location have been updated successfully.');
@@ -180,7 +182,33 @@ const PreferencesScreen = ({ navigation }) => {
       }
     }
   };
-
+  const renderRangeSlider = (label, value, setValue) => {
+    const rangeValues = [0, 5, 10, 50, 100, 200, 300];
+  
+    return (
+      <View style={styles.sliderContainer}>
+        <Text style={styles.sliderLabel}>{label}: {value}</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={rangeValues.length - 1}
+          step={1}
+          value={rangeValues.indexOf(value)}
+          onValueChange={(sliderValue) => {
+            setValue(rangeValues[sliderValue]);
+          }}
+          minimumTrackTintColor="#b28a68"
+          maximumTrackTintColor="#000000"
+        />
+        <View style={styles.markerContainer}>
+          {rangeValues.map(marker => (
+            <Text key={marker} style={styles.marker}>{marker}</Text>
+          ))}
+        </View>
+      </View>
+    );
+  };
+  
   const renderSlider = (label, value, setValue, min, max, step, markers) => (
     <View style={styles.sliderContainer}>
       <Text style={styles.sliderLabel}>{label}: {value}</Text>
@@ -261,6 +289,7 @@ const PreferencesScreen = ({ navigation }) => {
       {renderSlider('Hiking Skill (Beginner-Expert)', hikingSkill, setHikingSkill, 0, 10, 1, ['Beginner', 'Intermediate', 'Expert'])}
       {renderSlider('Biking Skill (Beginner-Expert)', bikingSkill, setBikingSkill, 0, 10, 1, ['Beginner', 'Intermediate', 'Expert'])}
       {renderSlider('Running Skill (Beginner-Expert)', runningSkill, setRunningSkill, 0, 10, 1, ['Beginner', 'Intermediate', 'Expert'])}
+      {renderRangeSlider('Range (Miles)', range, setRange)}
 
       {/* Approximate Location */}
       <Text style={styles.question}>Approximate Location:</Text>
