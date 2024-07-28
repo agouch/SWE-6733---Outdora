@@ -40,13 +40,16 @@ const MatchingScreen = () => {
   const fetchPotentialMatches = async () => {
     try {
       console.log('Fetching potential matches...');
-  
+      
       const currentUserRef = doc(firestore, 'users', user.uid);
       const currentUserDoc = await getDoc(currentUserRef);
       const currentUserData = currentUserDoc.data();
       console.log('Current user data:', currentUserData);
       console.log('Current user location:', currentUserData.location);
   
+      const userRange = currentUserData.range || 100; // Default to 100 if range is not set
+      console.log('User range:', userRange);
+      
       // Get the current user's rightSwipes
       const currentUserRightSwipes = currentUserData.rightSwipes || [];
   
@@ -97,8 +100,8 @@ const MatchingScreen = () => {
           otherUser.distance = distance;
           console.log(`Distance to ${otherUser.firstname}: ${distance.toFixed(2)} mi`);
   
-          // You can set a maximum distance here, e.g., 100 mi
-          if (distance > 100) {
+          // Apply the user's range preference
+          if (distance > userRange) {
             console.log('User too far away');
             return false;
           }
@@ -140,7 +143,7 @@ const MatchingScreen = () => {
       setLoading(false);
     }
   };
-
+  
   const handleSwipeRight = async (cardIndex) => {
     if (cardIndex >= potentialMatches.length) {
       Alert.alert('No more matches', 'You have viewed all potential matches.');
